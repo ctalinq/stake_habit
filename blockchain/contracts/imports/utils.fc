@@ -1,0 +1,29 @@
+#include "stdlib.fc";
+
+forall X -> int is_null (X x) asm "ISNULL";
+forall X -> (tuple, ()) push_back (tuple tail, X head) asm "CONS";
+forall X -> (tuple, (X)) pop_back (tuple t) asm "UNCONS";
+
+;;iterates cell tree and returns it bits size
+int get_cell_tree_size(cell root) inline {
+    int length = 0;
+
+    tuple stack = null();
+    ;; bring the main cell into the stack to process it in the loop
+    stack~push_back(root);
+    ;; do it until stack is not null
+    while (~ stack.is_null()) {
+        ;; get the cell from the stack and convert it to a slice to be able to process it
+        slice s = stack~pop_back().begin_parse();
+        length = length + s.slice_bits();
+
+        ;; do something with s data
+
+        ;; if the current slice has any refs, add them to stack
+        repeat (s.slice_refs()) {
+            stack~push_back(s~load_ref());
+        }
+    }
+
+    return length;
+}

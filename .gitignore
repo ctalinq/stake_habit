@@ -1,2 +1,5 @@
 .idea
+.turbo
 node_modules
+build
+coverage
