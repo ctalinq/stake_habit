@@ -10,6 +10,10 @@ import {
   toNano,
 } from "@ton/core";
 
+const EXECUTION_FEE: bigint = toNano("0.025")
+const COMMITMENT_DEPLOYMENT_FEE: bigint = toNano("0.025")
+const INTEREST_FEE: bigint = toNano("0.33")
+
 export type CommiterContractConfig = {
   commitment_code: Cell;
   owner_address: Address;
@@ -49,33 +53,28 @@ export class CommiterContract implements Contract {
   async sendCommitment(
     provider: ContractProvider,
     sender: Sender,
+    title: string,
     description: string,
+    dueDate: number,
+    stake: bigint,
   ) {
+    const value_to_send = stake
+        + EXECUTION_FEE * BigInt(2)
+        + COMMITMENT_DEPLOYMENT_FEE * BigInt(2)
+        + INTEREST_FEE
 
     const msg_body = beginCell()
       .storeUint(OP.COMMIT, 32)
-      .storeCoins(toNano("0.5"))
+      .storeRef(beginCell().storeStringTail(title).endCell())
       .storeRef(beginCell().storeStringTail(description).endCell())
+      .storeInt(dueDate, 32)
       .endCell();
 
     await provider.internal(sender, {
-      value: toNano("1"),
+      value: value_to_send,
       sendMode: SendMode.PAY_GAS_SEPARATELY,
       body: msg_body,
     });
-  }
-
-  async sendDeploy(provider: ContractProvider, via: Sender, value: bigint) {
-    await provider.internal(via, {
-      value,
-      sendMode: SendMode.PAY_GAS_SEPARATELY,
-      body: beginCell().endCell(),
-    });
-  }
-
-  async getAddress(provider: ContractProvider) {
-    const { stack } = await provider.get("get_address", []);
-    return stack.readAddress();
   }
 
   async getBalance(provider: ContractProvider) {

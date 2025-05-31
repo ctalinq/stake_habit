@@ -8,12 +8,18 @@ import {
 } from "@ton/core"
 
 export type CommiterContractConfig = {
+    stakerAddress: Address
+    title: string
     description: string
+    dueDate: number
 }
 
 export function commitmentContractConfigToCell(config: CommiterContractConfig): Cell {
     return beginCell()
+        .storeAddress(config.stakerAddress)
+        .storeRef(beginCell().storeStringTail(config.title).endCell())
         .storeRef(beginCell().storeStringTail(config.description).endCell())
+        .storeUint(config.dueDate, 32)
         .endCell();
 }
 
@@ -36,23 +42,18 @@ export class CommitmentContract implements Contract {
         return new CommitmentContract(address, init)
     }
 
-    async sendTest(
-        provider: ContractProvider,
-        sender: Sender,
-    ) {
-        const msg_body = beginCell()
-            .storeUint(1, 32)
-            .endCell();
-
-        await provider.internal(sender, {
-            value: toNano("1"),
-            sendMode: SendMode.PAY_GAS_SEPARATELY,
-            body: msg_body,
-        });
+    async getInfo(provider: ContractProvider) {
+        const {stack} = await provider.get('get_info', [])
+        return {
+            stakerAddress: stack.readAddress(),
+            title: stack.readString(),
+            description: stack.readString(),
+            dueDate: stack.readNumber()
+        }
     }
 
-    async getDescription(provider: ContractProvider) {
-        const {stack} = await provider.get('get_description', [])
-        return stack.readString()
+    async getBalance(provider: ContractProvider) {
+        const {stack} = await provider.get("balance", [])
+        return stack.readBigNumber()
     }
 }
