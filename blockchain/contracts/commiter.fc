@@ -8,10 +8,12 @@ const TRANSACTION_DATE_OFFSET_S = 60;
 ;;todo - adapt to current ton price
 const EXECUTION_FEE = 25000000;
 const COMMITMENT_DEPLOYMENT_FEE = 25000000;
+const COMMITMENT_EXECTUION_FEE = 5000000;
 const INTEREST_FEE = 330000000;
 const FEE = 2 * EXECUTION_FEE + 2 * COMMITMENT_DEPLOYMENT_FEE + INTEREST_FEE;
 const MINIMUM_STAKE = 3000000000;
 const MAXIMUM_STAKE = 100000000000;
+const MAXIMUM_RECIPIENTS_COUNT = 100;
 const MINIMUM_VALUE = MINIMUM_STAKE + FEE;
 const MAXIMUM_VALUE = MAXIMUM_STAKE + FEE;
 
@@ -39,7 +41,9 @@ cell pack_commitment_data(
     slice staker_address,
     cell commitment_title,
     cell commitment_description,
-    int commitment_due_date
+    int commitment_due_date,
+    cell commitment_recipients_list,
+    int commitment_recipients_count
 ) inline {
     int commitment_title_length = get_cell_tree_size(commitment_title);
     ;;todo move validation to inline method
@@ -65,11 +69,19 @@ cell pack_commitment_data(
     ;;todo - add exit code description
     throw_if(75, commitment_due_date > now() + 90 * 24 * 60 * 60 + TRANSACTION_DATE_OFFSET_S);
 
+    ;;todo create code errors table
+    throw_if(75, commitment_recipients_count < 1);
+    ;;todo - add exit code
+    throw_if(75, commitment_recipients_count > MAXIMUM_RECIPIENTS_COUNT);
+
     return  begin_cell()
         .store_slice(staker_address)
         .store_ref(commitment_title)
         .store_ref(commitment_description)
         .store_uint(commitment_due_date, 32)
+        .store_ref(commitment_recipients_list)
+        .store_uint(commitment_recipients_count, 32)
+        .store_ref(begin_cell().end_cell())
         .end_cell();
 }
 
@@ -78,7 +90,9 @@ cell calculate_commitment_state_init(
     slice staker_address,
     cell commitment_title,
     cell commitment_description,
-    int commitment_due_date
+    int commitment_due_date,
+    cell commitment_recipients_key_list,
+    int commitment_recipients_count
 ) inline {
     return begin_cell()
         .store_uint(0, 1) ;; split_depth:(Maybe (## 5))
@@ -91,7 +105,9 @@ cell calculate_commitment_state_init(
                 staker_address,
                 commitment_title,
                 commitment_description,
-                commitment_due_date
+                commitment_due_date,
+                commitment_recipients_key_list,
+                commitment_recipients_count
             )
         )
         .end_cell();
@@ -111,14 +127,18 @@ slice calculate_commitment_address(cell state_init) inline {
     int stake,
     cell commitment_title,
     cell commitment_description,
-    int commitment_due_date
+    int commitment_due_date,
+    cell commitment_recipients_key_list,
+    int commitment_recipients_count
 ) impure {
     cell state_init = calculate_commitment_state_init(
         commitment_code,
         staker_address,
         commitment_title,
         commitment_description,
-        commitment_due_date
+        commitment_due_date,
+        commitment_recipients_key_list,
+        commitment_recipients_count
     );
     slice to_commitment_address = calculate_commitment_address(state_init);
 
@@ -154,15 +174,18 @@ slice calculate_commitment_address(cell state_init) inline {
     (slice owner_address, cell commitment_code) = load_data();
 
     if (op == op::commit()) {
-        ;;todo create code errors table
-        throw_if(74, msg_value < MINIMUM_VALUE);
-        ;;todo create code errors table
-        throw_if(74, msg_value > MAXIMUM_VALUE);
-        int stake = msg_value - 2 * EXECUTION_FEE - INTEREST_FEE;
-
         cell commitment_title = in_msg_body~load_ref();
         cell commitment_description = in_msg_body~load_ref();
         int commitment_due_date = in_msg_body~load_uint(32);
+        cell commitment_recipients_key_list = in_msg_body~load_ref();
+        int commitment_recipients_count = get_cell_tree_count(commitment_recipients_key_list);
+
+        ;;todo create code errors table
+        throw_if(74, msg_value < MINIMUM_VALUE + COMMITMENT_EXECTUION_FEE * commitment_recipients_count);
+        ;;todo create code errors table
+        throw_if(74, msg_value > MAXIMUM_VALUE + COMMITMENT_EXECTUION_FEE * commitment_recipients_count);
+        int stake = msg_value - 2 * EXECUTION_FEE - INTEREST_FEE;
+
 
         make_commitment(
             commitment_code,
@@ -170,7 +193,9 @@ slice calculate_commitment_address(cell state_init) inline {
             stake,
             commitment_title,
             commitment_description,
-            commitment_due_date
+            commitment_due_date,
+            commitment_recipients_key_list,
+            commitment_recipients_count
         );
 
         return ();

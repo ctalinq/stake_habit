@@ -4,11 +4,13 @@ import {
     Cell,
     Contract,
     contractAddress,
-    ContractProvider, Sender, SendMode, toNano,
+    ContractProvider,
 } from "@ton/core"
 
 export type CommiterContractConfig = {
     stakerAddress: Address
+    recipientsList: Cell
+    recipientsCount: number
     title: string
     description: string
     dueDate: number
@@ -20,6 +22,9 @@ export function commitmentContractConfigToCell(config: CommiterContractConfig): 
         .storeRef(beginCell().storeStringTail(config.title).endCell())
         .storeRef(beginCell().storeStringTail(config.description).endCell())
         .storeUint(config.dueDate, 32)
+        .storeRef(config.recipientsList)
+        .storeUint(config.recipientsCount, 32)
+        .storeRef(beginCell().endCell())
         .endCell();
 }
 

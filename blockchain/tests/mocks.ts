@@ -23,3 +23,5 @@ export const tooLateDueDate = now + 91 * 24 * 60 * 60;
 export const validStake = toNano("10")
 export const notEnoughStake = toNano("2.99")
 export const tooManyStake = toNano("100.1")
+
+export const recipientIds = Array.from({ length: 100 }, (_, i) => (i + 1).toString());

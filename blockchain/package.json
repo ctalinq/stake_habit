@@ -15,6 +15,7 @@
     "@swc/core": "^1.11.29",
     "@ton/blueprint": "^0.34.0",
     "@ton/core": "^0.60.1",
+    "@ton/crypto": "^3.3.0",
     "@ton/sandbox": "^0.31.0",
     "@ton/test-utils": "^0.6.0",
     "@types/jest": "^29.5.14",

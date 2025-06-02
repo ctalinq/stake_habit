@@ -27,3 +27,48 @@ int get_cell_tree_size(cell root) inline {
 
     return length;
 }
+
+int find_cell_tree_slice(cell root, int value_hash) inline {
+    tuple stack = null();
+    ;; bring the main cell into the stack to process it in the loop
+    stack~push_back(root);
+    ;; do it until stack is not null
+    while (~ stack.is_null()) {
+        ;; get the cell from the stack and convert it to a slice to be able to process it
+        slice s = stack~pop_back().begin_parse();
+
+        if (string_hash(s) == value_hash) {
+            return 1;
+        }
+        ;; do something with s data
+
+        ;; if the current slice has any refs, add them to stack
+        repeat (s.slice_refs()) {
+            stack~push_back(s~load_ref());
+        }
+    }
+
+    return -1;
+}
+
+int get_cell_tree_count(cell root) inline {
+    int length = 0;
+    tuple stack = null();
+    ;; bring the main cell into the stack to process it in the loop
+    stack~push_back(root);
+    ;; do it until stack is not null
+    while (~ stack.is_null()) {
+        ;; get the cell from the stack and convert it to a slice to be able to process it
+        slice s = stack~pop_back().begin_parse();
+
+        length = length + 1;
+        ;; do something with s data
+
+        ;; if the current slice has any refs, add them to stack
+        repeat (s.slice_refs()) {
+            stack~push_back(s~load_ref());
+        }
+    }
+
+    return length;
+}

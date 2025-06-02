@@ -1,4 +1,4 @@
-import {Cell} from "@ton/core"
+import {beginCell, Cell, toNano} from "@ton/core"
 import { Blockchain, SandboxContract, TreasuryContract } from "@ton/sandbox"
 
 import "@ton/test-utils"
@@ -6,7 +6,7 @@ import { compile } from "@ton/blueprint"
 import { CommiterContract } from "../wrappers/CommiterContract"
 import {CommitmentContract} from "../wrappers/CommitmentContract";
 import {
-    emptyTitle, notEnoughStake,
+    emptyTitle, notEnoughStake, recipientIds,
     tooEarlyDueDate, tooLateDueDate,
     tooLongDescription,
     tooLongTitle, tooManyStake,
@@ -14,18 +14,23 @@ import {
     validDueDate, validMaximumDate, validMinimumDate, validStake,
     validTitle
 } from "./mocks";
+import {generateRecipientsKeyList, generateRecipientsKeys} from "../utils";
 
 describe("commiter.fc contract tests", () => {
     let blockchain: Blockchain
     let commiterContract: SandboxContract<CommiterContract>
     let ownerWallet: SandboxContract<TreasuryContract>
     let stakerWallet: SandboxContract<TreasuryContract>
+    let recipientsKeys: string[]
+    let recipientsKeyList: Cell
     let commiterCodeCell: Cell
     let commitmentCodeCell: Cell
 
     beforeAll(async () => {
         commiterCodeCell = await compile("CommiterContract")
         commitmentCodeCell = await compile("CommitmentContract")
+        recipientsKeys = await generateRecipientsKeys(recipientIds);
+        recipientsKeyList = generateRecipientsKeyList(recipientsKeys);
     })
 
 
@@ -57,6 +62,8 @@ describe("commiter.fc contract tests", () => {
             commitmentTitle,
             commitmentDescription,
             dueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
             stake,
         )
 
@@ -72,9 +79,16 @@ describe("commiter.fc contract tests", () => {
                 stakerAddress: stakerWallet.address,
                 title: commitmentTitle,
                 description: commitmentDescription,
-                dueDate
+                dueDate,
+                recipientsList: recipientsKeyList,
+                recipientsCount: recipientsKeys.length,
             }, commitmentCodeCell)
         )
+
+        await blockchain.setVerbosityForAddress(commitmentContract.address, {
+            print: true,
+            vmLogs: 'none',
+        })
 
         const savedCommitmentInfo = await commitmentContract.getInfo()
         const savedStake = await commitmentContract.getBalance()
@@ -92,6 +106,8 @@ describe("commiter.fc contract tests", () => {
             emptyTitle,
             validDescription,
             validDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
             validStake,
         )
 
@@ -110,6 +126,8 @@ describe("commiter.fc contract tests", () => {
             tooLongTitle,
             validDescription,
             validDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
             validStake,
         )
 
@@ -128,6 +146,8 @@ describe("commiter.fc contract tests", () => {
             validTitle,
             tooLongDescription,
             validDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
             validStake,
         )
 
@@ -146,6 +166,8 @@ describe("commiter.fc contract tests", () => {
             validTitle,
             validDescription,
             tooEarlyDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
             validStake,
         )
 
@@ -164,6 +186,8 @@ describe("commiter.fc contract tests", () => {
             validTitle,
             validDescription,
             tooLateDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
             validStake,
         )
 
@@ -182,6 +206,8 @@ describe("commiter.fc contract tests", () => {
             validTitle,
             validDescription,
             tooLateDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
             notEnoughStake,
         )
 
@@ -200,6 +226,8 @@ describe("commiter.fc contract tests", () => {
             validTitle,
             validDescription,
             tooLateDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
             tooManyStake,
         )
 
@@ -209,6 +237,176 @@ describe("commiter.fc contract tests", () => {
             success: false,
             //todo add exit code description
             exitCode: 74,
+        })
+    });
+
+    it("should not make commitment contract with recipients count greater than maximum", async () => {
+        const invalidRecipientsCountKeys = [...recipientsKeys, 'x'];
+        const invalidRecipientsCountKeyList = generateRecipientsKeyList(invalidRecipientsCountKeys)
+
+        const sentMessageResult = await commiterContract.sendCommitment(
+            stakerWallet.getSender(),
+            validTitle,
+            validDescription,
+            tooLateDueDate,
+            invalidRecipientsCountKeyList,
+            invalidRecipientsCountKeys.length,
+            tooManyStake,
+        )
+
+        expect(sentMessageResult.transactions).toHaveTransaction({
+            from: stakerWallet.address,
+            to: commiterContract.address,
+            success: false,
+            //todo add exit code description
+            exitCode: 74,
+        })
+    });
+
+    it(`should pay recipient reward if commitment ready`, async () => {
+        const commitmentDescription = validDescription
+        const commitmentTitle = validTitle
+        const stake = validStake
+
+         await commiterContract.sendCommitment(
+            stakerWallet.getSender(),
+            commitmentTitle,
+            commitmentDescription,
+            validDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
+            stake,
+        );
+
+        const commitmentContract = blockchain.openContract(
+            await CommitmentContract.createFromConfig({
+                stakerAddress: stakerWallet.address,
+                title: commitmentTitle,
+                description: commitmentDescription,
+                dueDate: validDueDate,
+                recipientsList: recipientsKeyList,
+                recipientsCount: recipientsKeys.length,
+            }, commitmentCodeCell)
+        )
+
+        const recipientWallet = stakerWallet = await blockchain.treasury("recipientAddress");
+        const sentMessageResult = await recipientWallet.send({
+            value: toNano("0.05"),
+            to: commitmentContract.address,
+            body: beginCell()
+                //todo to module with op codes
+                .storeUint(0x1, 32)
+                .storeRef(beginCell().storeStringTail(recipientsKeys[0]).endCell())
+                .endCell()
+        })
+
+        expect(sentMessageResult.transactions).toHaveTransaction({
+            from: commitmentContract.address,
+            to: recipientWallet.address,
+            success: true,
+        })
+    });
+
+    it(`should not pay already rewarded recipient if commitment ready`, async () => {
+        const commitmentDescription = validDescription
+        const commitmentTitle = validTitle
+        const stake = validStake
+
+        await commiterContract.sendCommitment(
+            stakerWallet.getSender(),
+            commitmentTitle,
+            commitmentDescription,
+            validDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
+            stake,
+        );
+
+        const commitmentContract = blockchain.openContract(
+            await CommitmentContract.createFromConfig({
+                stakerAddress: stakerWallet.address,
+                title: commitmentTitle,
+                description: commitmentDescription,
+                dueDate: validDueDate,
+                recipientsList: recipientsKeyList,
+                recipientsCount: recipientsKeys.length,
+            }, commitmentCodeCell)
+        )
+
+        const recipientWallet = stakerWallet = await blockchain.treasury("recipientAddress");
+        await recipientWallet.send({
+            value: toNano("0.05"),
+            to: commitmentContract.address,
+            body: beginCell()
+                //todo to module with op codes
+                .storeUint(0x1, 32)
+                .storeRef(beginCell().storeStringTail(recipientsKeys[0]).endCell())
+                .endCell()
+        })
+
+        const sentMessageResult = await recipientWallet.send({
+            value: toNano("0.05"),
+            to: commitmentContract.address,
+            body: beginCell()
+                //todo to module with op codes
+                .storeUint(0x1, 32)
+                .storeRef(beginCell().storeStringTail(recipientsKeys[0]).endCell())
+                .endCell()
+        })
+
+        expect(sentMessageResult.transactions).toHaveTransaction({
+            from: recipientWallet.address,
+            to: commitmentContract.address,
+            success: false,
+            //todo add exit table
+            exitCode: 77
+        })
+    });
+
+    it(`should not pay recipient with invalid key if commitment ready`, async () => {
+        const commitmentDescription = validDescription
+        const commitmentTitle = validTitle
+        const stake = validStake
+
+        await commiterContract.sendCommitment(
+            stakerWallet.getSender(),
+            commitmentTitle,
+            commitmentDescription,
+            validDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
+            stake,
+        );
+
+        const commitmentContract = blockchain.openContract(
+            await CommitmentContract.createFromConfig({
+                stakerAddress: stakerWallet.address,
+                title: commitmentTitle,
+                description: commitmentDescription,
+                dueDate: validDueDate,
+                recipientsList: recipientsKeyList,
+                recipientsCount: recipientsKeys.length,
+            }, commitmentCodeCell)
+        )
+
+        const recipientWallet = stakerWallet = await blockchain.treasury("recipientAddress");
+
+        const sentMessageResult = await recipientWallet.send({
+            value: toNano("0.05"),
+            to: commitmentContract.address,
+            body: beginCell()
+                //todo to module with op codes
+                .storeUint(0x1, 32)
+                .storeRef(beginCell().storeStringTail("some_wrong_key").endCell())
+                .endCell()
+        })
+
+        expect(sentMessageResult.transactions).toHaveTransaction({
+            from: recipientWallet.address,
+            to: commitmentContract.address,
+            success: false,
+            //todo add exit table
+            exitCode: 76
         })
     });
 })

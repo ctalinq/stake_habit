@@ -12,6 +12,7 @@ import {
 
 const EXECUTION_FEE: bigint = toNano("0.025")
 const COMMITMENT_DEPLOYMENT_FEE: bigint = toNano("0.025")
+const COMMITMENT_EXECUTION_FEE: bigint = toNano("0.005")
 const INTEREST_FEE: bigint = toNano("0.33")
 
 export type CommiterContractConfig = {
@@ -56,18 +57,22 @@ export class CommiterContract implements Contract {
     title: string,
     description: string,
     dueDate: number,
+    recipientsList: Cell,
+    recipientsCount: number,
     stake: bigint,
   ) {
     const value_to_send = stake
         + EXECUTION_FEE * BigInt(2)
         + COMMITMENT_DEPLOYMENT_FEE * BigInt(2)
         + INTEREST_FEE
+        + COMMITMENT_EXECUTION_FEE * BigInt(recipientsCount)
 
     const msg_body = beginCell()
       .storeUint(OP.COMMIT, 32)
       .storeRef(beginCell().storeStringTail(title).endCell())
       .storeRef(beginCell().storeStringTail(description).endCell())
       .storeInt(dueDate, 32)
+      .storeRef(recipientsList)
       .endCell();
 
     await provider.internal(sender, {
