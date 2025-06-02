@@ -1,0 +1,207 @@
+#include "imports/stdlib.fc";
+#include "imports/utils.fc";
+
+int op::commit() asm "1 PUSHINT";
+int workchain() asm "0 PUSHINT";
+
+const TRANSACTION_DATE_OFFSET_S = 60;
+;;todo - adapt to current ton price
+const EXECUTION_FEE = 25000000;
+const COMMITMENT_DEPLOYMENT_FEE = 25000000;
+const COMMITMENT_EXECTUION_FEE = 5000000;
+const INTEREST_FEE = 330000000;
+const FEE = 2 * EXECUTION_FEE + 2 * COMMITMENT_DEPLOYMENT_FEE + INTEREST_FEE;
+const MINIMUM_STAKE = 3000000000;
+const MAXIMUM_STAKE = 100000000000;
+const MAXIMUM_RECIPIENTS_COUNT = 100;
+const MINIMUM_VALUE = MINIMUM_STAKE + FEE;
+const MAXIMUM_VALUE = MAXIMUM_STAKE + FEE;
+
+(slice, cell) load_data() inline {
+    var ds = get_data().begin_parse();
+    return (
+        ds~load_msg_addr(),
+        ds~load_ref()
+    );
+}
+
+(slice) get_address() method_id {
+    var (owner_address, commitment_code) = load_data();
+    return (
+        owner_address
+    );
+}
+
+int balance() method_id {
+    var [balance, _] = get_balance();
+    return balance;
+}
+
+cell pack_commitment_data(
+    slice staker_address,
+    cell commitment_title,
+    cell commitment_description,
+    int commitment_due_date,
+    cell commitment_recipients_list,
+    int commitment_recipients_count
+) inline {
+    int commitment_title_length = get_cell_tree_size(commitment_title);
+    ;;todo move validation to inline method
+
+    ;;title required
+    ;;todo - add exit code description
+    throw_if(75, commitment_title_length == 0);
+    ;;maximum title size - 40 chars in UTF-32 encoding
+    ;;todo - add exit code description
+    throw_if(75, commitment_title_length > 1280);
+    int commitment_description_length = get_cell_tree_size(commitment_description);
+
+    ;;maximum description size - 1000 chars in UTF-32 encoding
+    ;;todo - add exit code description
+    throw_if(75, commitment_description_length > 32000);
+
+    ;;minimum due date - tommorow
+    ;;todo - add support for different timezones
+    ;;todo - add exit code description
+    throw_if(75, commitment_due_date < now() + 24 * 60 * 60 - TRANSACTION_DATE_OFFSET_S);
+    ;;maximum due date - 90 days since today
+    ;;todo - add support for different timezones
+    ;;todo - add exit code description
+    throw_if(75, commitment_due_date > now() + 90 * 24 * 60 * 60 + TRANSACTION_DATE_OFFSET_S);
+
+    ;;todo create code errors table
+    throw_if(75, commitment_recipients_count < 1);
+    ;;todo - add exit code
+    throw_if(75, commitment_recipients_count > MAXIMUM_RECIPIENTS_COUNT);
+
+    return  begin_cell()
+        .store_uint(0, 2)
+        .store_slice(staker_address)
+        .store_ref(commitment_title)
+        .store_ref(commitment_description)
+        .store_uint(commitment_due_date, 32)
+        .store_ref(commitment_recipients_list)
+        .store_uint(commitment_recipients_count, 32)
+        .store_ref(begin_cell().end_cell())
+        .end_cell();
+}
+
+cell calculate_commitment_state_init(
+    cell commitment_code,
+    slice staker_address,
+    cell commitment_title,
+    cell commitment_description,
+    int commitment_due_date,
+    cell commitment_recipients_key_list,
+    int commitment_recipients_count
+) inline {
+    return begin_cell()
+        .store_uint(0, 1) ;; split_depth:(Maybe (## 5))
+        .store_uint(0, 1) ;; special:(Maybe TickTock)
+        .store_uint(1, 1) ;; (Maybe ^Cell)
+        .store_uint(1, 1) ;; (Maybe ^Cell)
+        .store_uint(0, 1) ;; (HashmapE 256 SimpleLib)
+        .store_ref(commitment_code)
+        .store_ref(pack_commitment_data(
+                staker_address,
+                commitment_title,
+                commitment_description,
+                commitment_due_date,
+                commitment_recipients_key_list,
+                commitment_recipients_count
+            )
+        )
+        .end_cell();
+}
+
+slice calculate_commitment_address(cell state_init) inline {
+    return begin_cell().store_uint(4, 3)
+        .store_int(workchain(), 8)
+        .store_uint(cell_hash(state_init), 256)
+        .end_cell()
+        .begin_parse();
+}
+
+() make_commitment(
+    cell commitment_code,
+    slice staker_address,
+    int stake,
+    cell commitment_title,
+    cell commitment_description,
+    int commitment_due_date,
+    cell commitment_recipients_key_list,
+    int commitment_recipients_count
+) impure {
+    cell state_init = calculate_commitment_state_init(
+        commitment_code,
+        staker_address,
+        commitment_title,
+        commitment_description,
+        commitment_due_date,
+        commitment_recipients_key_list,
+        commitment_recipients_count
+    );
+    slice to_commitment_address = calculate_commitment_address(state_init);
+
+    var msg = begin_cell()
+        .store_uint(0x18, 6)
+        .store_slice(to_commitment_address)
+        .store_coins(stake)
+        .store_uint(4 + 2 + 1, 1 + 4 + 4 + 64 + 32 + 1 + 1 + 1)
+        .store_ref(state_init)
+        ;;do nothing on recv_internal after deployment
+        .store_ref(begin_cell().end_cell())
+     .end_cell();
+    send_raw_message(msg,1);
+}
+
+
+() recv_internal(int msg_value, cell in_msg_full, slice in_msg_body) impure {
+    if (in_msg_body.slice_empty?()) {
+        ;; ignore empty messages
+        return ();
+    }
+    slice cs = in_msg_full.begin_parse();
+    int flags = cs~load_uint(4);
+
+    if (flags & 1) {
+        ;; ignore all bounced messages
+        return ();
+    }
+
+    slice staker_address = cs~load_msg_addr();
+    int op = in_msg_body~load_uint(32);
+
+    (slice owner_address, cell commitment_code) = load_data();
+
+    if (op == op::commit()) {
+        cell commitment_title = in_msg_body~load_ref();
+        cell commitment_description = in_msg_body~load_ref();
+        int commitment_due_date = in_msg_body~load_uint(32);
+        cell commitment_recipients_key_list = in_msg_body~load_ref();
+        int commitment_recipients_count = get_cell_tree_count(commitment_recipients_key_list);
+
+        ;;todo create code errors table
+        throw_if(74, msg_value < MINIMUM_VALUE + COMMITMENT_EXECTUION_FEE * commitment_recipients_count);
+        ;;todo create code errors table
+        throw_if(74, msg_value > MAXIMUM_VALUE + COMMITMENT_EXECTUION_FEE * commitment_recipients_count);
+        int stake = msg_value - 2 * EXECUTION_FEE - INTEREST_FEE;
+
+
+        make_commitment(
+            commitment_code,
+            staker_address,
+            stake,
+            commitment_title,
+            commitment_description,
+            commitment_due_date,
+            commitment_recipients_key_list,
+            commitment_recipients_count
+        );
+
+        return ();
+    }
+
+    ;;todo create code errors table
+    ;;throw_unless(73, equal_slice_bits(sender_address, owner_address));
+}
