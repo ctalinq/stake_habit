@@ -75,6 +75,7 @@ cell pack_commitment_data(
     throw_if(75, commitment_recipients_count > MAXIMUM_RECIPIENTS_COUNT);
 
     return  begin_cell()
+        .store_uint(0, 2)
         .store_slice(staker_address)
         .store_ref(commitment_title)
         .store_ref(commitment_description)

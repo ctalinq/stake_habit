@@ -18,6 +18,7 @@ export type CommiterContractConfig = {
 
 export function commitmentContractConfigToCell(config: CommiterContractConfig): Cell {
     return beginCell()
+        .storeUint(0, 2)
         .storeAddress(config.stakerAddress)
         .storeRef(beginCell().storeStringTail(config.title).endCell())
         .storeRef(beginCell().storeStringTail(config.description).endCell())

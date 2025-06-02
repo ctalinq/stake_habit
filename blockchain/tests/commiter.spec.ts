@@ -16,6 +16,7 @@ import {
 } from "./mocks";
 import {generateRecipientsKeyList, generateRecipientsKeys} from "../utils";
 
+//todo move commitment related tests to separate tests
 describe("commiter.fc contract tests", () => {
     let blockchain: Blockchain
     let commiterContract: SandboxContract<CommiterContract>
@@ -289,7 +290,7 @@ describe("commiter.fc contract tests", () => {
             }, commitmentCodeCell)
         )
 
-        const recipientWallet = stakerWallet = await blockchain.treasury("recipientAddress");
+        const recipientWallet = await blockchain.treasury("recipientAddress");
         const sentMessageResult = await recipientWallet.send({
             value: toNano("0.05"),
             to: commitmentContract.address,
@@ -322,6 +323,10 @@ describe("commiter.fc contract tests", () => {
             stake,
         );
 
+        //three days passed...
+        //set blockchain 3 days after today to be able to withdraw
+        blockchain.now = Math.floor(Date.now() / 1000) + 3 * 24 * 60 * 60;
+
         const commitmentContract = blockchain.openContract(
             await CommitmentContract.createFromConfig({
                 stakerAddress: stakerWallet.address,
@@ -333,7 +338,7 @@ describe("commiter.fc contract tests", () => {
             }, commitmentCodeCell)
         )
 
-        const recipientWallet = stakerWallet = await blockchain.treasury("recipientAddress");
+        const recipientWallet = await blockchain.treasury("recipientAddress");
         await recipientWallet.send({
             value: toNano("0.05"),
             to: commitmentContract.address,
@@ -361,9 +366,64 @@ describe("commiter.fc contract tests", () => {
             //todo add exit table
             exitCode: 77
         })
+
+        blockchain.now = Math.floor(Date.now() / 1000);
     });
 
     it(`should not pay recipient with invalid key if commitment ready`, async () => {
+        const commitmentDescription = validDescription
+        const commitmentTitle = validTitle
+        const stake = validStake
+
+        await commiterContract.sendCommitment(
+            stakerWallet.getSender(),
+            commitmentTitle,
+            commitmentDescription,
+            validDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
+            stake,
+        );
+
+        //three days passed...
+        //set blockchain 3 days after today to be able to withdraw
+        blockchain.now = Math.floor(Date.now() / 1000) + 3 * 24 * 60 * 60;
+
+        const commitmentContract = blockchain.openContract(
+            await CommitmentContract.createFromConfig({
+                stakerAddress: stakerWallet.address,
+                title: commitmentTitle,
+                description: commitmentDescription,
+                dueDate: validDueDate,
+                recipientsList: recipientsKeyList,
+                recipientsCount: recipientsKeys.length,
+            }, commitmentCodeCell)
+        )
+
+        const recipientWallet = await blockchain.treasury("recipientAddress");
+
+        const sentMessageResult = await recipientWallet.send({
+            value: toNano("0.05"),
+            to: commitmentContract.address,
+            body: beginCell()
+                //todo to module with op codes
+                .storeUint(0x1, 32)
+                .storeRef(beginCell().storeStringTail("some_wrong_key").endCell())
+                .endCell()
+        })
+
+        expect(sentMessageResult.transactions).toHaveTransaction({
+            from: recipientWallet.address,
+            to: commitmentContract.address,
+            success: false,
+            //todo add exit table
+            exitCode: 76
+        })
+
+        blockchain.now = Math.floor(Date.now() / 1000);
+    });
+
+    it(`should not pay recipient if commitment succeeded`, async () => {
         const commitmentDescription = validDescription
         const commitmentTitle = validTitle
         const stake = validStake
@@ -389,7 +449,16 @@ describe("commiter.fc contract tests", () => {
             }, commitmentCodeCell)
         )
 
-        const recipientWallet = stakerWallet = await blockchain.treasury("recipientAddress");
+        await stakerWallet.send({
+            value: toNano("0.05"),
+            to: commitmentContract.address,
+            body: beginCell()
+                //todo to module with op codes
+                .storeUint(0x2, 32)
+                .endCell()
+        })
+
+        const recipientWallet = await blockchain.treasury("recipientAddress");
 
         const sentMessageResult = await recipientWallet.send({
             value: toNano("0.05"),
@@ -397,7 +466,7 @@ describe("commiter.fc contract tests", () => {
             body: beginCell()
                 //todo to module with op codes
                 .storeUint(0x1, 32)
-                .storeRef(beginCell().storeStringTail("some_wrong_key").endCell())
+                .storeRef(beginCell().storeStringTail(recipientsKeys[0]).endCell())
                 .endCell()
         })
 
@@ -405,8 +474,102 @@ describe("commiter.fc contract tests", () => {
             from: recipientWallet.address,
             to: commitmentContract.address,
             success: false,
+            exitCode: 78
+        })
+    });
+
+    it(`should pay staker back if commitment ready`, async () => {
+        const commitmentDescription = validDescription
+        const commitmentTitle = validTitle
+        const stake = validStake
+
+        await commiterContract.sendCommitment(
+            stakerWallet.getSender(),
+            commitmentTitle,
+            commitmentDescription,
+            validDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
+            stake,
+        );
+
+        const commitmentContract = blockchain.openContract(
+            await CommitmentContract.createFromConfig({
+                stakerAddress: stakerWallet.address,
+                title: commitmentTitle,
+                description: commitmentDescription,
+                dueDate: validDueDate,
+                recipientsList: recipientsKeyList,
+                recipientsCount: recipientsKeys.length,
+            }, commitmentCodeCell)
+        )
+
+        const sentMessageResult = await stakerWallet.send({
+            value: toNano("0.05"),
+            to: commitmentContract.address,
+            body: beginCell()
+                //todo to module with op codes
+                .storeUint(0x2, 32)
+                .endCell()
+        })
+
+        expect(sentMessageResult.transactions).toHaveTransaction({
+            from: commitmentContract.address,
+            to: stakerWallet.address,
+            success: true,
+        })
+    });
+
+    it(`should not pay staker back if commitment already withdrawn`, async () => {
+        const commitmentDescription = validDescription
+        const commitmentTitle = validTitle
+        const stake = validStake
+
+        await commiterContract.sendCommitment(
+            stakerWallet.getSender(),
+            commitmentTitle,
+            commitmentDescription,
+            validDueDate,
+            recipientsKeyList,
+            recipientsKeys.length,
+            stake,
+        );
+
+        const commitmentContract = blockchain.openContract(
+            await CommitmentContract.createFromConfig({
+                stakerAddress: stakerWallet.address,
+                title: commitmentTitle,
+                description: commitmentDescription,
+                dueDate: validDueDate,
+                recipientsList: recipientsKeyList,
+                recipientsCount: recipientsKeys.length,
+            }, commitmentCodeCell)
+        )
+
+        await stakerWallet.send({
+            value: toNano("0.05"),
+            to: commitmentContract.address,
+            body: beginCell()
+                //todo to module with op codes
+                .storeUint(0x2, 32)
+                .endCell()
+        })
+
+        const sentMessageResult = await stakerWallet.send({
+            value: toNano("0.05"),
+            to: commitmentContract.address,
+            body: beginCell()
+                //todo to module with op codes
+                .storeUint(0x2, 32)
+                .endCell()
+        })
+
+        expect(sentMessageResult.transactions).toHaveTransaction({
+            from: stakerWallet.address,
+            to: commitmentContract.address,
+            success: false,
             //todo add exit table
-            exitCode: 76
+            exitCode: 78
         })
     });
 })
