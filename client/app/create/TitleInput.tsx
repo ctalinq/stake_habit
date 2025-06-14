@@ -47,10 +47,10 @@ export default function TitleInput({
     <div className={`w-full ${className}`}>
       <div className="relative">
         <label
-          className={`absolute left-3 transition-all duration-200 pointer-events-none ${
+          className={`absolute z-1 left-3 transition-all duration-200 pointer-events-none ${
             focused || value
-              ? "top-2 text-xs text-blue-400 dark:text-blue-300"
-              : "top-4 text-sm text-gray-400 dark:text-gray-500"
+              ? "top-2 text-xs text-blue-400 dark:text-white"
+              : "top-4 text-sm text-gray-400 dark:text-white"
           }`}
         >
           {t("title.label")}
@@ -74,7 +74,7 @@ export default function TitleInput({
         />
 
         <div
-          className={`absolute right-3 top-6 text-xs font-medium transition-colors duration-200 ${
+          className={`absolute right-3 top-3 text-xs font-medium transition-colors duration-200 ${
             charCount > maxLength * 0.9
               ? "text-orange-400 dark:text-orange-300"
               : charCount === maxLength
