@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import type { Route } from "./+types/root";
+import "~/i18n"
 import "./app.css";
 
 import React, {Suspense} from "react";

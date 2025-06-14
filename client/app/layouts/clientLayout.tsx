@@ -1,4 +1,3 @@
-import "~/i18n"
 import { init } from "@telegram-apps/sdk-react"
 
 if (import.meta.env.DEV) {
