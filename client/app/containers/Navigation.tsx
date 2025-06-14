@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useLayoutEffect, useState} from "react";
 import {useLaunchParams, backButton, viewport} from "@telegram-apps/sdk-react";
 import {ThemeToggle} from "~/components";
 import {useLocation, useNavigate} from "react-router";
@@ -8,8 +8,9 @@ const Navigation = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const canGoBack = location.key !== "default"
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (canGoBack) {
       if (!backButton.isMounted()) {
         backButton.mount();
@@ -23,15 +24,24 @@ const Navigation = () => {
         backButton.hide();
       }
     }
-
-    if (viewport.expand.isAvailable()) {
-      viewport.expand();
-    }
   }, [canGoBack]);
+
+  useLayoutEffect(() => {
+    if (viewport.mount.isAvailable()) {
+      viewport.mount().then(() => {
+        if (viewport.requestFullscreen.isAvailable()) {
+          viewport.requestFullscreen().then(() => {
+            if (viewport.isFullscreen())
+              setIsFullscreen(true)
+          });
+        }
+      })
+    }
+  }, []);
 
   if (!launchParams?.tgWebAppData?.user) return null;
 
-  return <div className="flex justify-between align-center mb-4">
+  return <div className={`flex justify-between align-center ${isFullscreen ? "mt-25" : "mt-4"} mb-4`}>
     <img
       src={launchParams.tgWebAppData.user.photo_url}
       alt="User Avatar"
