@@ -1,0 +1,179 @@
+#include "imports/stdlib.fc";
+#include "imports/utils.fc";
+
+const COMMITMENT_EXECTUION_FEE = 5000000;
+
+int op::recipient_withdraw() asm "1 PUSHINT";
+int op::staker_withdraw() asm "2 PUSHINT";
+int op::staker_fail() asm "3 PUSHINT";
+
+int status::initial() asm "0 PUSHINT";
+int status::succeeded() asm "1 PUSHINT";
+int status::failed() asm "2 PUSHINT";
+
+(int, slice, cell, cell, int, cell, int, cell) load_data() inline {
+    var ds = get_data().begin_parse();
+    return (
+        ds~load_uint(2),
+        ds~load_msg_addr(),
+        ds~load_ref(),
+        ds~load_ref(),
+        ds~load_uint(32),
+        ds~load_ref(),
+        ds~load_uint(32),
+        ds~load_ref()
+    );
+}
+
+
+() save_data(int status, cell awarded_key_list) impure inline {
+    (
+        int previous_status,
+        slice staker_address,
+        cell title,
+        cell description,
+        int due_date,
+        cell recipients_key_list,
+        int recipients_count,
+        cell previous_awarded_key_list
+    ) = load_data();
+
+    set_data(begin_cell()
+        .store_uint(status, 2)
+        .store_slice(staker_address)
+        .store_ref(title)
+        .store_ref(description)
+        .store_uint(due_date, 32)
+        .store_ref(recipients_key_list)
+        .store_uint(recipients_count, 32)
+        .store_ref(awarded_key_list)
+        .end_cell());
+}
+
+
+(slice, cell, cell, int) get_info() method_id {
+    (
+        int status,
+        slice staker_address,
+        cell title,
+        cell description,
+        int due_date,
+        cell recipients_key_list,
+        int recipients_count,
+        cell awarded_key_list
+    ) = load_data();
+
+    return (
+        staker_address,
+        title,
+        description,
+        due_date
+    );
+}
+
+int balance() method_id {
+    var [balance, _] = get_balance();
+    return balance;
+}
+
+() recv_internal(int msg_value, cell in_msg_full, slice in_msg_body) impure {
+    if (in_msg_body.slice_empty?()) {
+        ;; ignore empty messages
+        return ();
+    }
+
+
+    slice cs = in_msg_full.begin_parse();
+    int flags = cs~load_uint(4);
+
+    if (flags & 1) {
+        ;; ignore all bounced messages
+        return ();
+    }
+
+    slice sender_address = cs~load_msg_addr();
+    int op = in_msg_body~load_uint(32);
+
+    (
+        int status,
+        slice staker_address,
+        cell title,
+        cell description,
+        int due_date,
+        cell recipients_key_list,
+        int recipients_count,
+        cell awarded_key_list
+    ) = load_data();
+
+    if (op == op::recipient_withdraw()) {
+        ;;todo add exit codes table
+        if (status == status::initial()) {
+            ;;todo add exit codes table
+            throw_if(78, now() < due_date);
+        } elseif (status == status::succeeded()) {
+            ;;todo add exit codes table
+            throw(78);
+        }
+
+        cell recipient_key_cell = in_msg_body~load_ref();
+        slice recipient_key = recipient_key_cell.begin_parse();
+        int recipient_key_hash = string_hash(recipient_key);
+
+        int already_awarded = find_cell_tree_slice(awarded_key_list, recipient_key_hash);
+
+        ;;todo add exit codes table
+        throw_if(77, already_awarded == 1);
+
+        int recipient_key_found = find_cell_tree_slice(recipients_key_list, recipient_key_hash);
+        ;;todo add min max balance
+        int award = balance() / recipients_count;
+
+        ;;todo add exit codes table
+        ;;todo check due time
+        ;;todo check status if completed - not get paid
+        ;;todo check status if valid
+        throw_if(76, recipient_key_found == -1);
+
+        var msg = begin_cell()
+            .store_uint(0x18, 6)
+            .store_slice(sender_address)
+            .store_coins(award - COMMITMENT_EXECTUION_FEE)
+            .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1);
+
+        cell new_awarded_key_list = begin_cell()
+            .store_ref(recipient_key_cell)
+            .store_ref(awarded_key_list)
+            .end_cell();
+
+        save_data(status, new_awarded_key_list);
+
+        send_raw_message(msg.end_cell(), 1);
+    } elseif (op == op::staker_withdraw()) {
+        ;;todo add exit codes table
+        throw_unless(73, equal_slice_bits(sender_address, staker_address));
+        ;;todo add exit codes table
+        throw_if(78, status != status::initial());
+        ;;todo add exit codes table
+        throw_if(78, now() > due_date);
+
+        var msg = begin_cell()
+            .store_uint(0x18, 6)
+            .store_slice(sender_address)
+            .store_coins(0)
+            .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1);
+
+        save_data(status::succeeded(), awarded_key_list);
+
+        send_raw_message(msg.end_cell(), 64);
+    }  elseif (op == op::staker_fail()) {
+        ;;todo add exit codes table
+        throw_unless(73, equal_slice_bits(sender_address, staker_address));
+        ;;todo add exit codes table
+        throw_if(78, status != status::initial());
+        ;;todo add exit codes table
+        throw_if(78, now() > due_date);
+
+        save_data(status::failed(), awarded_key_list);
+    }
+}
+

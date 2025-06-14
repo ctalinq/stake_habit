@@ -1,0 +1,11 @@
+{
+  "create": "Create commitment",
+  "title": {
+    "label": "Commitment Title",
+    "placeholder": "e.g., Morning Exercise, Daily Reading...",
+    "good": "Title looks good",
+    "error": {
+      "maxLength": "Title must be {{maxLength}} characters or less"
+    }
+  }
+}
