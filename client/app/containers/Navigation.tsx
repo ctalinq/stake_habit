@@ -8,7 +8,7 @@ const Navigation = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const canGoBack = location.key !== "default"
-  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isFullscreen] = useState(false)
 
   useLayoutEffect(() => {
     if (canGoBack) {
@@ -30,10 +30,10 @@ const Navigation = () => {
     if (viewport.mount.isAvailable()) {
       viewport.mount().then(() => {
         if (viewport.requestFullscreen.isAvailable()) {
-          viewport.requestFullscreen().then(() => {
-            if (viewport.isFullscreen())
-              setIsFullscreen(true)
-          });
+          //viewport.requestFullscreen().then(() => {
+          //if (viewport.isFullscreen())
+          //setIsFullscreen(true)
+          //});
         }
       })
     }
