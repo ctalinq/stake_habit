@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {useLaunchParams, backButton} from "@telegram-apps/sdk-react";
+import {useLaunchParams, backButton, viewport} from "@telegram-apps/sdk-react";
 import {ThemeToggle} from "~/components";
 import {useLocation, useNavigate} from "react-router";
 
@@ -22,6 +22,10 @@ const Navigation = () => {
       if (backButton.isMounted()) {
         backButton.hide();
       }
+    }
+
+    if (viewport.expand.isAvailable()) {
+      viewport.expand();
     }
   }, [canGoBack]);
 
