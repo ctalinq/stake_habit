@@ -31,7 +31,7 @@ const Navigation = () => {
 
   if (!launchParams?.tgWebAppData?.user) return null;
 
-  return <div className="flex justify-between align-center">
+  return <div className="flex justify-between align-center mb-4">
     <img
       src={launchParams.tgWebAppData.user.photo_url}
       alt="User Avatar"
