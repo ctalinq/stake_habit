@@ -9,8 +9,9 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 
-import React from "react";
+import React, {Suspense, useEffect, useState} from "react";
 import { Container, Card, GradientText } from "./components";
+import HomeSkeleton from "~/home/homeSkeleton";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -26,6 +27,27 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const [isInterpolationInitialized, setIsInterpolationInitialized] = useState(false)
+  const [isTelegramSDKInitialized, setIsTelegramSDKInitialized] = useState(false)
+  const isInitialized = isInterpolationInitialized && isTelegramSDKInitialized;
+
+  useEffect(() => {
+    import("./i18n").then(() => {
+      setIsInterpolationInitialized(true)
+    })
+
+    if (import.meta.env.DEV) {
+      import("eruda").then((eruda) => {
+        eruda.default.init();
+      });
+    }
+
+    import("@telegram-apps/sdk-react").then(({ init }) => {
+      init()
+      setIsTelegramSDKInitialized(true)
+    })
+  }, []);
+
   return (
     <html lang="en">
       <head>
@@ -35,7 +57,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className="gradient-bg min-h-screen">
-        {children}
+        {isInitialized ? <Suspense fallback={<HomeSkeleton />}>{children}</Suspense> : <HomeSkeleton/>}
         <ScrollRestoration />
         <Scripts />
       </body>

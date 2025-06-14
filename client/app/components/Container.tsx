@@ -26,10 +26,10 @@ export default function Container({
   const contentStyles = centerContent ? "mx-auto pt-2" : "";
 
   return (
-    <main className={`${baseStyles} ${className}`}>
+    <div className={`${baseStyles} ${className}`}>
       <div className={`${maxWidthStyles[maxWidth]} ${contentStyles}`}>
         {children}
       </div>
-    </main>
+    </div>
   );
 }
