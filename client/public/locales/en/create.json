@@ -7,5 +7,14 @@
     "error": {
       "maxLength": "Title must be {{maxLength}} characters or less"
     }
+  },
+  "description": {
+    "label": "Commitment Description",
+    "placeholder": "Describe your habit in detail...",
+    "good": "Description looks good!",
+    "error": {
+      "maxLength": "Description must be {{maxLength}} characters or less",
+      "minLength": "Description must be at least {{minLength}} character(s)"
+    }
   }
 }

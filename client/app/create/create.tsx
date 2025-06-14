@@ -1,22 +1,42 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import TitleInput from "./TitleInput";
-import { Card, Button } from "../components";
+import { Card, Button, TextArea } from "../components";
 import Navigation from "~/containers/Navigation";
-import {Container} from "~/components";
+import { Container } from "~/components";
 
 export default function Create() {
   const { t } = useTranslation("create");
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
   return (
     <Container>
-      <Navigation/>
+      <Navigation />
       <Card>
         <div className="space-y-6">
-          <TitleInput value={title} onChange={setTitle} />
+          <TitleInput
+            value={title}
+            onChange={setTitle}
+          />
 
-          <Button disabled={!title.trim()} className="w-full">
+          <TextArea
+            value={description}
+            onChange={setDescription}
+            label={t("description.label")}
+            placeholder={t("description.placeholder")}
+            good={t("description.good")}
+            maxLengthError={t("description.error.maxLength", { maxLength: 1000 })}
+            minLengthError={t("description.error.minLength", { maxLength: 1 })}
+            minLength={1}
+            maxLength={1000}
+            rows={5}
+          />
+
+          <Button
+            disabled={!title.trim() || !description.trim()}
+            className="w-full"
+          >
             {t("create")}
           </Button>
         </div>
