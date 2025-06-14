@@ -1,14 +1,14 @@
 import React, {useLayoutEffect, useState} from "react";
 import {useLaunchParams, backButton, viewport} from "@telegram-apps/sdk-react";
-import {ThemeToggle} from "~/components";
-import {useLocation, useNavigate} from "react-router";
+import {Container, ThemeToggle} from "~/components";
+import {Outlet, useLocation, useNavigate} from "react-router";
 
-const Navigation = () => {
+const NavbarLayout = () => {
   const launchParams = useLaunchParams()
   const navigate = useNavigate()
   const location = useLocation()
   const canGoBack = location.key !== "default"
-  const [isFullscreen] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   useLayoutEffect(() => {
     if (canGoBack) {
@@ -30,10 +30,10 @@ const Navigation = () => {
     if (viewport.mount.isAvailable()) {
       viewport.mount().then(() => {
         if (viewport.requestFullscreen.isAvailable()) {
-          //viewport.requestFullscreen().then(() => {
-          //if (viewport.isFullscreen())
-          //setIsFullscreen(true)
-          //});
+          viewport.requestFullscreen().then(() => {
+            if (viewport.isFullscreen())
+              setIsFullscreen(true)
+          });
         }
       })
     }
@@ -41,14 +41,17 @@ const Navigation = () => {
 
   if (!launchParams?.tgWebAppData?.user) return null;
 
-  return <div className={`flex justify-between align-center ${isFullscreen ? "mt-25" : "mt-4"} mb-4`}>
-    <img
-      src={launchParams.tgWebAppData.user.photo_url}
-      alt="User Avatar"
-      className="w-12 h-12 avatar-ring"
-    />
-    <ThemeToggle />
-  </div>
+  return <Container>
+    <div className={`flex justify-between align-center ${isFullscreen ? "mt-25" : "mt-4"} mb-4`}>
+      <img
+        src={launchParams.tgWebAppData.user.photo_url}
+        alt="User Avatar"
+        className="w-12 h-12 avatar-ring"
+      />
+      <ThemeToggle />
+    </div>
+    <Outlet />
+  </Container>
 }
 
-export default Navigation;
+export default NavbarLayout;
