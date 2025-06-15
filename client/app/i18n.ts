@@ -10,6 +10,7 @@ i18next
   .init({
     debug: true,
     fallbackLng: "en",
+    load: "languageOnly",
     ns: ["home"],
     defaultNS: "home",
   })
