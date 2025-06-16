@@ -16,5 +16,15 @@
       "maxLength": "Description must be {{maxLength}} characters or less",
       "minLength": "Description must be at least {{minLength}} character(s)"
     }
+  },
+  "stake": {
+    "label": "Stake Amount",
+    "placeholder": "Enter amount in ton...",
+    "good": "Amount looks good!",
+    "error": {
+      "isNaN": "Please enter a valid number",
+      "minError": "Value must be at least {{min}}",
+      "maxError":  "Value must be {{max}} or less"
+    }
   }
 }

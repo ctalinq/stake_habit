@@ -5,3 +5,4 @@ export { default as ThemeToggle } from "./ThemeToggle";
 export { default as Container } from "./Container";
 export { default as GradientText } from "./GradientText";
 export { default as TextArea } from "./TextArea";
+export { default as DecimalInput } from "./DecimalInput";
