@@ -7,8 +7,10 @@ import path from "path";
 export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
   server: {
+    //todo - to env
     host: "0.0.0.0",
     port: 5173,
+    allowedHosts: ["devalchemy.online"],
   },
   resolve: {
     alias: {

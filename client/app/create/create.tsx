@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import TitleInput from "./TitleInput";
-import {
-  Card,
-  Button,
-  TextArea,
-  DecimalInput,
-} from "../components";
+import { Card, Button, TextArea, DecimalInput } from "../components";
 
 export default function Create() {
   const { t } = useTranslation("create");
