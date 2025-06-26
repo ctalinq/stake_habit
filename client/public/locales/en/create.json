@@ -24,7 +24,13 @@
     "error": {
       "isNaN": "Please enter a valid number",
       "minError": "Value must be at least {{min}}",
-      "maxError":  "Value must be {{max}} or less"
+      "maxError": "Value must be {{max}} or less"
     }
+  },
+  "dueDate": {
+    "label": "Due Date",
+    "placeholder": "Select due date...",
+    "good": "Due date looks good!",
+    "error": "Due date is incorrect! You can select date between tomorrow and next 90 days."
   }
 }

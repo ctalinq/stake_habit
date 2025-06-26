@@ -1,13 +1,44 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import TitleInput from "./TitleInput";
-import { Card, Button, TextArea, DecimalInput } from "../components";
+import {
+  Card,
+  Button,
+  TextArea,
+  DecimalInput,
+  DatePicker,
+} from "../components";
+import { startOfDay } from "~/util";
 
 export default function Create() {
   const { t } = useTranslation("create");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [stakeAmount, setStakeAmount] = useState<number | null>(null);
+
+  const today = useMemo(() => {
+    return startOfDay(new Date());
+  }, []);
+
+  const tomorrow = useMemo(() => {
+    const now = new Date(today);
+    now.setDate(today.getDate() + 1);
+    return startOfDay(now);
+  }, [today]);
+
+  const maxEndDate = useMemo(() => {
+    const now = new Date(today);
+    now.setDate(today.getDate() + 90);
+    return startOfDay(now);
+  }, [today]);
+
+  const defaultDate = useMemo(() => {
+    const now = new Date(today);
+    now.setDate(today.getDate() + 7);
+    return startOfDay(now);
+  }, [today]);
+
+  const [dueDate, setDueDate] = useState<Date>(defaultDate);
 
   return (
     <Card>
@@ -60,13 +91,29 @@ export default function Create() {
           }
         />
 
+        <DatePicker
+          value={dueDate}
+          onChange={setDueDate}
+          label={t("dueDate.label")}
+          minDate={tomorrow}
+          maxDate={maxEndDate}
+          error={
+            dueDate && dueDate >= tomorrow && dueDate <= maxEndDate
+              ? undefined
+              : t("dueDate.error")
+          }
+          good={t("dueDate.good")}
+        />
+
         <Button
           disabled={
             !title.trim() ||
             !description.trim() ||
             stakeAmount === null ||
             stakeAmount < 10 ||
-            stakeAmount > 100
+            stakeAmount > 100 ||
+            !dueDate ||
+            !(dueDate >= tomorrow && dueDate <= maxEndDate)
           }
           className="w-full"
         >
