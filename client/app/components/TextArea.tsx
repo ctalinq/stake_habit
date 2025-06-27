@@ -5,15 +5,14 @@ interface TextAreaProps {
   onChange: (value: string) => void;
   placeholder?: string;
   label?: string;
-  maxLengthError?: string
-  minLengthError?: string
+  maxLengthError?: string;
+  minLengthError?: string;
   error?: string;
   good?: string;
   className?: string;
   minLength?: number;
   maxLength?: number;
   showCharCounter?: boolean;
-  showProgressBar?: boolean;
   rows?: number;
 }
 
@@ -30,7 +29,6 @@ export default function TextArea({
   minLength = 1,
   maxLength = 1000,
   showCharCounter = true,
-  showProgressBar = true,
   rows = 4,
 }: TextAreaProps) {
   const [focused, setFocused] = useState(false);
@@ -40,9 +38,9 @@ export default function TextArea({
   useEffect(() => {
     setCharCount(value.length);
 
-    if ((value.length > maxLength) && maxLengthError) {
+    if (value.length > maxLength && maxLengthError) {
       setValidationError(maxLengthError);
-    } else if ((value.length < minLength && value.length > 0) && minLengthError) {
+    } else if (value.length < minLength && value.length > 0 && minLengthError) {
       setValidationError(minLengthError);
     } else {
       setValidationError("");
@@ -63,10 +61,10 @@ export default function TextArea({
     <div className={`w-full ${className}`}>
       <div className="relative">
         <label
-          className={`absolute left-3 transition-all duration-200 pointer-events-none z-1 ${
+          className={`absolute dark:bg-gray-900/60 left-3 transition-all duration-200 pointer-events-none z-1 ${
             focused || value
-              ? "top-2 text-xs text-blue-400 dark:text-white"
-              : "top-4 text-sm text-gray-400 dark:text-white"
+              ? "top-1 pt-1 text-xs text-blue-400 dark:text-white"
+              : "top-1 pt-3 text-sm text-gray-400 dark:text-white"
           }`}
         >
           {label}
@@ -104,54 +102,41 @@ export default function TextArea({
         )}
       </div>
 
-      {showProgressBar && (
-        <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700/60 rounded-full h-1.5 overflow-hidden shadow-inner">
-          <div
-            className={`h-1.5 rounded-full transition-all duration-300 shadow-sm ${
-              charCount > maxLength * 0.9
-                ? "bg-gradient-to-r from-orange-400 to-orange-500 dark:from-orange-300 dark:to-orange-400"
-                : charCount === maxLength
-                  ? "bg-gradient-to-r from-red-400 to-red-500 dark:from-red-300 dark:to-red-400"
-                  : "bg-gradient-to-r from-blue-400 to-blue-500 dark:from-blue-400 dark:to-blue-300"
-            }`}
-            style={{ width: `${(charCount / maxLength) * 100}%` }}
-          />
-        </div>
-      )}
+      <div className="mt-2 min-h-5">
+        {showError && (
+          <div className="text-sm text-red-400 dark:text-red-300 flex items-center gap-1 animate-pulse">
+            <svg
+              className="w-4 h-4 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {showError}
+          </div>
+        )}
 
-      {showError && (
-        <div className="mt-2 text-sm text-red-400 dark:text-red-300 flex items-center gap-1 animate-pulse">
-          <svg
-            className="w-4 h-4 flex-shrink-0"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-              clipRule="evenodd"
-            />
-          </svg>
-          {showError}
-        </div>
-      )}
-
-      {isValid && value.length > 0 && !showError && (
-        <div className="mt-2 text-sm text-green-400 dark:text-green-300 flex items-center gap-1">
-          <svg
-            className="w-4 h-4 flex-shrink-0"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-              clipRule="evenodd"
-            />
-          </svg>
-          {good}
-        </div>
-      )}
+        {isValid && value.length > 0 && !showError && (
+          <div className="text-sm text-green-400 dark:text-green-300 flex items-center gap-1">
+            <svg
+              className="w-4 h-4 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {good}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
