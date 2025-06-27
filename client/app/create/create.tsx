@@ -15,6 +15,7 @@ export default function Create() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [stakeAmount, setStakeAmount] = useState<number | null>(null);
+  const [recepientsCount, setRecepientsCount] = useState<number | null>(null);
 
   const today = useMemo(() => {
     return startOfDay(new Date());
@@ -63,12 +64,13 @@ export default function Create() {
           onChange={setStakeAmount}
           min={10}
           max={100}
+          round={2}
           label={t("stake.label")}
           placeholder={t("stake.placeholder")}
           naNError={t("stake.error.isNaN")}
           minError={t("stake.error.minError", { min: 10 })}
           maxError={t("stake.error.maxError", { max: 100 })}
-          good={"stake.good"}
+          good={t("stake.good")}
           // TON icon
           icon={
             <svg
@@ -89,6 +91,20 @@ export default function Create() {
               </g>
             </svg>
           }
+        />
+
+        <DecimalInput
+          value={recepientsCount}
+          onChange={setRecepientsCount}
+          min={1}
+          max={10}
+          round={0}
+          label={t("recepientsCount.label")}
+          placeholder={t("recepientsCount.placeholder")}
+          naNError={t("recepientsCount.error.isNaN")}
+          minError={t("recepientsCount.error.minError", { min: 1 })}
+          maxError={t("recepientsCount.error.maxError", { max: 10 })}
+          good={t("recepientsCount.good")}
         />
 
         <DatePicker
@@ -112,6 +128,9 @@ export default function Create() {
             stakeAmount === null ||
             stakeAmount < 10 ||
             stakeAmount > 100 ||
+            recepientsCount === null ||
+            recepientsCount < 1 ||
+            recepientsCount > 10 ||
             !dueDate ||
             !(dueDate >= tomorrow && dueDate <= maxEndDate)
           }

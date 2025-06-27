@@ -20,7 +20,17 @@
   "stake": {
     "label": "Stake Amount",
     "placeholder": "Enter amount in ton...",
-    "good": "Amount looks good!",
+    "good": "TON amount looks good!",
+    "error": {
+      "isNaN": "Please enter a valid number",
+      "minError": "Value must be at least {{min}}",
+      "maxError": "Value must be {{max}} or less"
+    }
+  },
+  "recepientsCount": {
+    "label": "Number of Recipients",
+    "placeholder": "Enter number of recipients...",
+    "good": "Number of recipients looks good!",
     "error": {
       "isNaN": "Please enter a valid number",
       "minError": "Value must be at least {{min}}",

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { roundTo } from "~/util";
 
 interface DecimalInputProps {
   value: number | null;
   onChange: (value: number | null) => void;
   label?: string;
   placeholder?: string;
+  round?: number;
   min?: number;
   max?: number;
   className?: string;
@@ -24,6 +26,7 @@ export default function DecimalInput({
   min = 1,
   max = 100,
   className = "",
+  round,
   error,
   naNError,
   icon,
@@ -59,7 +62,9 @@ export default function DecimalInput({
     setFocused(false);
     if (!validationError) {
       const numValue = parseFloat(dirtyValue);
-      onChange(numValue);
+      const rounded = round !== undefined ? roundTo(numValue, round) : numValue;
+      onChange(rounded);
+      setDirtyValue(rounded.toString());
     }
   };
 
@@ -127,7 +132,7 @@ export default function DecimalInput({
         </div>
       )}
 
-      {isValid && !showError && validationError && (
+      {isValid && !showError && (
         <div className="mt-2 text-sm text-green-400 dark:text-green-300 flex items-center gap-1">
           <svg
             className="w-4 h-4 flex-shrink-0"
