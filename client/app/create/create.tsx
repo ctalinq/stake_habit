@@ -43,7 +43,7 @@ export default function Create() {
 
   return (
     <Card>
-      <div className="space-y-6">
+      <div className="space-y-2">
         <TitleInput value={title} onChange={setTitle} />
 
         <TextArea
