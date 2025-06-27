@@ -7,3 +7,4 @@ export { default as GradientText } from "./GradientText";
 export { default as TextArea } from "./TextArea";
 export { default as DecimalInput } from "./DecimalInput";
 export { default as DatePicker } from "./DatePicker";
+export { default as TextInput } from "./TextInput";

@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import TitleInput from "./TitleInput";
 import {
   Card,
   Button,
   TextArea,
   DecimalInput,
   DatePicker,
+  TextInput,
 } from "../components";
 import { startOfDay } from "~/util";
 
@@ -44,7 +44,15 @@ export default function Create() {
   return (
     <Card>
       <div className="space-y-2">
-        <TitleInput value={title} onChange={setTitle} />
+        <TextInput
+          value={title}
+          onChange={setTitle}
+          label={t("title.label")}
+          placeholder={t("title.placeholder")}
+          good={t("title.good")}
+          maxLengthError={t("title.error.maxLength", { maxLength: 40 })}
+          maxLength={40}
+        />
 
         <TextArea
           value={description}
