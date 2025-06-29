@@ -1,5 +1,7 @@
-FROM node:20-alpine AS build-env
-COPY . /app/
+FROM node:23-alpine AS build-env
 WORKDIR /app
-RUN npm i
+COPY package*.json ./
+COPY client/package*.json ./client/
+RUN npm install
+COPY . .
 RUN npm run build
