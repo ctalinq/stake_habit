@@ -22,3 +22,5 @@ jobs:
         run: docker create --name stake_habit_client-container stake_habit-client
       - name: copy build to nginx serve directory
         run: docker cp stake_habit_client-container:/app/client/build/ /var/www/stake-habit/
+      - name: remove temporary container
+        run: docker rm stake_habit_client-container
