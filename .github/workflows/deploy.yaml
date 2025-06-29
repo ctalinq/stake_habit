@@ -13,3 +13,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Build client docker image
         run: DOCKER_BUILDKIT=0 docker compose build --no-cache --memory=2g
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: create temporary container with client build
+        run: docker create --name stake_habit_client-container stake_habit-client
+      - name: copy build to nginx serve directory
+        run: docker cp stake_habit_client-container:/app/client/build/ /var/www/stake-habit/
