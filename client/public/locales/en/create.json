@@ -1,0 +1,46 @@
+{
+  "create": "Create commitment",
+  "title": {
+    "label": "Commitment Title",
+    "placeholder": "e.g., Morning Exercise, Daily Reading...",
+    "good": "Title looks good",
+    "error": {
+      "maxLength": "Title must be {{maxLength}} characters or less"
+    }
+  },
+  "description": {
+    "label": "Commitment Description",
+    "placeholder": "Describe your habit in detail...",
+    "good": "Description looks good!",
+    "error": {
+      "maxLength": "Description must be {{maxLength}} characters or less",
+      "minLength": "Description must be at least {{minLength}} character(s)"
+    }
+  },
+  "stake": {
+    "label": "Stake Amount",
+    "placeholder": "Enter amount in ton...",
+    "good": "TON amount looks good!",
+    "error": {
+      "isNaN": "Please enter a valid number",
+      "minError": "Value must be at least {{min}}",
+      "maxError": "Value must be {{max}} or less"
+    }
+  },
+  "recepientsCount": {
+    "label": "Number of Recipients",
+    "placeholder": "Enter number of recipients...",
+    "good": "Number of recipients looks good!",
+    "error": {
+      "isNaN": "Please enter a valid number",
+      "minError": "Value must be at least {{min}}",
+      "maxError": "Value must be {{max}} or less"
+    }
+  },
+  "dueDate": {
+    "label": "Due Date",
+    "placeholder": "Select due date...",
+    "good": "Due date looks good!",
+    "error": "Due date is incorrect! You can select date between tomorrow and next 90 days."
+  }
+}

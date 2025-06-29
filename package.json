@@ -4,10 +4,15 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "build": "npm run build",
-    "test": "echo test",
-    "prepare": "husky"
+    "dev": "turbo dev",
+    "build": "turbo run build",
+    "test": "turbo test",
+    "prepare": "husky",
+    "lint": "turbo lint"
   },
+  "workspaces": [
+    "client"
+  ],
   "author": "",
   "license": "ISC",
   "description": "",
