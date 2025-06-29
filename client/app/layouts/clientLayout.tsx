@@ -6,12 +6,10 @@ import { Outlet } from "react-router";
 import HomeSkeleton from "~/home/homeSkeleton";
 
 export default function ClientLayout() {
-  const [isInitialized, setIsInitialized] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const initialize = async () => {
-    console.log("Initializing here");
     if (!isTMA()) {
-      console.log("Initializing client layout");
       mockEnv();
     }
 
