@@ -11,7 +11,6 @@ export default function ClientLayout() {
   const initialize = async () => {
     if (!(await isTMA("complete"))) {
       mockEnv();
-      init();
     }
 
     if (import.meta.env.DEV) {
@@ -19,6 +18,7 @@ export default function ClientLayout() {
       eruda.default.init();
     }
 
+    init();
     setIsInitialized(true);
   };
 
