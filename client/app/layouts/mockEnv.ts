@@ -1,6 +1,6 @@
-import { mockTelegramEnv, isTMA, emitEvent } from "@telegram-apps/sdk-react";
+import { mockTelegramEnv, emitEvent } from "@telegram-apps/sdk-react";
 
-if (!(await isTMA("complete"))) {
+function mockEnv() {
   const themeParams = {
     accent_text_color: "#6ab2f2",
     bg_color: "#17212b",
@@ -74,3 +74,5 @@ if (!(await isTMA("complete"))) {
     "⚠️ As long as the current environment was not considered as the Telegram-based one, it was mocked. Take a note, that you should not do it in production and current behavior is only specific to the development process. Environment mocking is also applied only in development mode. So, after building the application, you will not see this behavior and related warning, leading to crashing the application outside Telegram."
   );
 }
+
+export default mockEnv;
