@@ -6,10 +6,10 @@ on:
       - master
 
 jobs:
-  deployment:
+  build:
     runs-on: self-hosted
     steps:
       - name: Clone step - clone and check out repository
         uses: actions/checkout@v4
-      - name: Test runner
-        run: echo "Hello World!"
+      - name: Build client docker image
+        run: docker compose up --build
