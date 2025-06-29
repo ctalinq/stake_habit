@@ -10,6 +10,7 @@ export default function ClientLayout() {
 
   const initialize = async () => {
     if (!isTMA()) {
+      console.log("Initializing client layout");
       mockEnv();
     }
 
