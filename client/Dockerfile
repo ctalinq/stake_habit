@@ -1,7 +1,7 @@
 FROM node:20-alpine AS development-dependencies-env
 COPY . /app
 WORKDIR /app
-RUN npm ci
+RUN npm i
 
 FROM node:20-alpine AS build-env
 COPY . /app/
