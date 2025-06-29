@@ -14,7 +14,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "~": path.resolve(__dirname, "app"), // 👈 ЭТО ОБЯЗАТЕЛЬНО
+      "~": path.resolve(__dirname, "app"),
     },
   },
 });

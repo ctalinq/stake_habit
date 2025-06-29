@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "turbo dev",
-    "build": "npm run build",
+    "build": "turbo run build",
     "test": "turbo test",
     "prepare": "husky",
     "lint": "turbo lint"
