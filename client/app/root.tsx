@@ -9,7 +9,7 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 
-import React, {Suspense} from "react";
+import React, { Suspense } from "react";
 import { Container, Card, GradientText } from "./components";
 import HomeSkeleton from "~/home/homeSkeleton";
 

@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import mockEnv from "./mockEnv";
 import { Outlet } from "react-router";
 import HomeSkeleton from "~/home/homeSkeleton";
+import { TonConnectUIProvider } from "@tonconnect/ui-react";
+import { ThemeProvider } from "~/contexts/useTheme";
+
+//todo - to env
+const manifestUrl = "https://sh.devalchemy.online/manifest.json";
 
 export default function ClientLayout() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -28,5 +33,11 @@ export default function ClientLayout() {
 
   if (!isInitialized) return <HomeSkeleton />;
 
-  return <Outlet />;
+  return (
+    <TonConnectUIProvider manifestUrl={manifestUrl}>
+      <ThemeProvider>
+        <Outlet />
+      </ThemeProvider>
+    </TonConnectUIProvider>
+  );
 }

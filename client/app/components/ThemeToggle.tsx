@@ -1,35 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useTheme } from "~/contexts/useTheme";
 
 export default function ThemeToggle() {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    const systemPrefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-
-    if (savedTheme === "dark" || (!savedTheme && systemPrefersDark)) {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
-    } else {
-      setIsDark(false);
-      document.documentElement.classList.remove("dark");
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-
-    if (newTheme) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  };
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <button
@@ -41,7 +13,7 @@ export default function ThemeToggle() {
         {/* Sun icon */}
         <svg
           className={`absolute inset-0 w-6 h-6 text-yellow-500 transition-all duration-300 ${
-            isDark
+            theme === "dark"
               ? "opacity-0 rotate-90 scale-75"
               : "opacity-100 rotate-0 scale-100"
           }`}
@@ -54,7 +26,7 @@ export default function ThemeToggle() {
         {/* Moon icon */}
         <svg
           className={`absolute inset-0 w-6 h-6 text-blue-400 transition-all duration-300 ${
-            isDark
+            theme === "dark"
               ? "opacity-100 rotate-0 scale-100"
               : "opacity-0 -rotate-90 scale-75"
           }`}
