@@ -10,10 +10,7 @@ export default defineConfig({
     //todo - to env
     host: "0.0.0.0",
     port: 5173,
-    allowedHosts: [
-      "stake-habit.devalchemy.online",
-      "stake-habit-dev.devalchemy.online",
-    ],
+    allowedHosts: ["shdev.devalchemy.online", "devalchemy.online"],
   },
   resolve: {
     alias: {
