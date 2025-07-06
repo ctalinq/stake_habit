@@ -6,6 +6,7 @@ import { Outlet } from "react-router";
 import HomeSkeleton from "~/home/homeSkeleton";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { ThemeProvider } from "~/contexts/useTheme";
+import { AppRoot } from "@telegram-apps/telegram-ui";
 
 //todo - to env
 const manifestUrl = "https://sh.devalchemy.online/manifest.json";
@@ -34,10 +35,12 @@ export default function ClientLayout() {
   if (!isInitialized) return <HomeSkeleton />;
 
   return (
-    <TonConnectUIProvider manifestUrl={manifestUrl}>
-      <ThemeProvider>
-        <Outlet />
-      </ThemeProvider>
-    </TonConnectUIProvider>
+    <AppRoot>
+      <TonConnectUIProvider manifestUrl={manifestUrl}>
+        <ThemeProvider>
+          <Outlet />
+        </ThemeProvider>
+      </TonConnectUIProvider>
+    </AppRoot>
   );
 }

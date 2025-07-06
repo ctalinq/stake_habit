@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -7,10 +7,15 @@ import {
   DecimalInput,
   DatePicker,
   TextInput,
+  Modal,
 } from "../components";
 import { startOfDay } from "~/util";
+import { TonConnectButton } from "~/containers";
+import { useTonWallet } from "@tonconnect/ui-react";
 
 export default function Create() {
+  const wallet = useTonWallet();
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const { t } = useTranslation("create");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -40,6 +45,23 @@ export default function Create() {
   }, [today]);
 
   const [dueDate, setDueDate] = useState<Date>(defaultDate);
+
+  const closeWalletModal = useCallback(() => {
+    setIsWalletModalOpen(false);
+  }, []);
+
+  const openWalletModal = useCallback(() => {
+    setIsWalletModalOpen(true);
+  }, []);
+
+  const handleCreateClicked = useCallback(() => {
+    if (!wallet) {
+      openWalletModal();
+      return;
+    } else {
+      //todo - create commitment
+    }
+  }, [wallet]);
 
   return (
     <Card>
@@ -130,6 +152,7 @@ export default function Create() {
         />
 
         <Button
+          onClick={handleCreateClicked}
           disabled={
             !title.trim() ||
             !description.trim() ||
@@ -147,6 +170,15 @@ export default function Create() {
           {t("create")}
         </Button>
       </div>
+      <Modal
+        modalClassName="w-90 space-y-4 flex flex-col items-center"
+        isOpen={isWalletModalOpen}
+        onClose={closeWalletModal}
+      >
+        <h3 className="text-xl font-bold">{t("walletModal.title")}</h3>
+        <div className="text-center">{t("walletModal.description")}</div>
+        <TonConnectButton onConnectStart={closeWalletModal} />
+      </Modal>
     </Card>
   );
 }
