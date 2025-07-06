@@ -7,6 +7,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 import type { Route } from "./+types/root";
+import { MODAL_ROOT_ID } from "./const";
 import "./app.css";
 
 import React, { Suspense } from "react";
@@ -39,6 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Suspense fallback={<HomeSkeleton />}> {children} </Suspense>
         <ScrollRestoration />
         <Scripts />
+        <div id={MODAL_ROOT_ID} />
       </body>
     </html>
   );

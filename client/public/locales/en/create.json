@@ -42,5 +42,9 @@
     "placeholder": "Select due date...",
     "good": "Due date looks good!",
     "error": "Due date is incorrect! You can select date between tomorrow and next 90 days."
+  },
+  "walletModal": {
+    "title": "Connect Wallet ☝️",
+    "description": "To create commitment you need to connect your wallet"
   }
 }
