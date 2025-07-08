@@ -2,9 +2,15 @@
   "name": "blockchain",
   "private": true,
   "version": "1.0.0",
-  "main": "index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/blockchain.js",
+      "types": "./dist/wrappers/index.d.ts"
+    }
+  },
   "scripts": {
-    "build": "npx blueprint build",
+    "compile": "npx blueprint build",
+    "build": "vite build",
     "test": "vitest run"
   },
   "keywords": [],
@@ -22,6 +28,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "vite": "^7.0.2",
+    "vite-plugin-dts": "^4.5.4",
     "vitest": "^3.2.4"
   }
 }
