@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "exports": {
     ".": {
-      "import": "./dist/blockchain.js",
+      "import": "./dist/blockchain.mjs",
       "types": "./dist/wrappers/index.d.ts"
     }
   },
