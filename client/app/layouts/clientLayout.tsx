@@ -7,6 +7,9 @@ import HomeSkeleton from "~/home/homeSkeleton";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { ThemeProvider } from "~/contexts/useTheme";
 import { AppRoot } from "@telegram-apps/telegram-ui";
+import { Buffer } from "buffer";
+
+window.Buffer = Buffer;
 
 //todo - to env
 const manifestUrl = "https://sh.devalchemy.online/manifest.json";
