@@ -12,6 +12,8 @@ import {
 import { startOfDay } from "~/util";
 import { TonConnectButton } from "~/containers";
 import { useTonWallet } from "@tonconnect/ui-react";
+import { CommiterContract } from "blockchain";
+import { Address, beginCell } from "@ton/core";
 
 export default function Create() {
   const wallet = useTonWallet();
@@ -59,7 +61,15 @@ export default function Create() {
       openWalletModal();
       return;
     } else {
-      //todo - create commitment
+      console.log(
+        CommiterContract.createFromConfig(
+          {
+            owner_address: Address.parse("test"),
+            commitment_code: beginCell().endCell(),
+          },
+          beginCell().endCell()
+        )
+      );
     }
   }, [wallet]);
 
