@@ -7,7 +7,15 @@
       "outputs": ["build/**"]
     },
     "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "build/**"]
+    },
+    "build:blockchain": {
       "dependsOn": ["compile"],
+      "outputs": ["dist/**"]
+    },
+    "build:client": {
+      "dependsOn": ["build:blockchain"],
       "outputs": ["dist/**", "build/**"]
     },
     "lint": {},
