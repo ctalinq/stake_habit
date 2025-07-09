@@ -1,7 +1,7 @@
 import type { Sender, SenderArguments } from "@ton/core";
 import { useTonConnectUI } from "@tonconnect/ui-react";
 
-export function useSendTon(): { sender: Sender } {
+export function useTonSender(): { sender: Sender } {
   const [tonConnectUI] = useTonConnectUI();
 
   return {

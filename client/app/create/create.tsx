@@ -12,8 +12,10 @@ import {
 import { startOfDay } from "~/util";
 import { TonConnectButton } from "~/containers";
 import { useTonWallet } from "@tonconnect/ui-react";
-import { CommiterContract } from "blockchain";
-import { Address, beginCell } from "@ton/core";
+import { useCommiterContract } from "./hooks/useCommiterContract";
+import { useTonSender } from "./hooks/useTonSender";
+import { generateRecipientsKeyList, generateRecipientsKeys } from "blockchain";
+import { toNano } from "@ton/core";
 
 export default function Create() {
   const wallet = useTonWallet();
@@ -23,6 +25,9 @@ export default function Create() {
   const [description, setDescription] = useState("");
   const [stakeAmount, setStakeAmount] = useState<number | null>(null);
   const [recepientsCount, setRecepientsCount] = useState<number | null>(null);
+
+  const commiterContract = useCommiterContract();
+  const { sender } = useTonSender();
 
   const today = useMemo(() => {
     return startOfDay(new Date());
@@ -56,22 +61,34 @@ export default function Create() {
     setIsWalletModalOpen(true);
   }, []);
 
-  const handleCreateClicked = useCallback(() => {
-    if (!wallet) {
-      openWalletModal();
-      return;
-    } else {
-      console.log(
-        CommiterContract.createFromConfig(
-          {
-            owner_address: Address.parse("test"),
-            commitment_code: beginCell().endCell(),
-          },
-          beginCell().endCell()
-        )
+  const createCommitment = async () => {
+    if (commiterContract && stakeAmount && recepientsCount) {
+      const dueDateSeconds = Math.floor(dueDate.getTime() / 1000);
+      const recipientNumbers = Array.from({ length: recepientsCount }, (_, i) =>
+        (i + 1).toString()
+      );
+      const recipientsKeys = await generateRecipientsKeys(recipientNumbers);
+      const recipientsKeyList = generateRecipientsKeyList(recipientsKeys);
+
+      commiterContract.sendCommitment(
+        sender,
+        title,
+        description,
+        dueDateSeconds,
+        recipientsKeyList,
+        recipientsKeys.length,
+        toNano(stakeAmount.toString())
       );
     }
-  }, [wallet]);
+  };
+
+  const handleCreateClicked = () => {
+    if (!wallet) {
+      openWalletModal();
+    } else {
+      void createCommitment();
+    }
+  };
 
   return (
     <Card>
