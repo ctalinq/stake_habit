@@ -22,7 +22,9 @@ export const TonClientProvider = ({
   });
 
   const initClient = useCallback(async () => {
-    const endpoint = await getHttpEndpoint(import.meta.env.VITE_TON_NETWORK);
+    const endpoint = await getHttpEndpoint({
+      network: import.meta.env.VITE_TON_NETWORK,
+    });
     const client = new TonClient({
       endpoint,
     });
