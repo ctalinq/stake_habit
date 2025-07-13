@@ -3,16 +3,27 @@
   "private": true,
   "version": "1.0.0",
   "exports": {
-    ".": {
-      "import": "./dist/blockchain.mjs",
-      "types": "./dist/wrappers/index.d.ts"
-    }
+    ".": {},
+    "./commiterContract": {
+      "import": "./dist/commiterContract.mjs",
+      "types": "./dist/CommiterContract.d.ts"
+    },
+    "./commitmentContract": {
+      "import": "./dist/commitmentContract.mjs",
+      "types": "./dist/CommitmentContract.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils.mjs",
+      "types": "./dist/utils.d.ts"
+    },
+    "./commitment": "./build/CommitmentContract.compiled.json"
   },
   "scripts": {
-    "compile": "npx blueprint build",
+    "compile": "npx blueprint build --all",
     "deploy": "npx blueprint run",
     "build": "vite build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:watch": "vitest watch"
   },
   "keywords": [],
   "author": "",

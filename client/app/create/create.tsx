@@ -14,8 +14,13 @@ import { TonConnectButton } from "~/containers";
 import { useTonWallet } from "@tonconnect/ui-react";
 import { useCommiterContract } from "./hooks/useCommiterContract";
 import { useTonSender } from "./hooks/useTonSender";
-import { generateRecipientsKeyList, generateRecipientsKeys } from "blockchain";
-import { toNano } from "@ton/core";
+import { CommitmentContract } from "blockchain/commitmentContract";
+import {
+  generateRecipientsKeyList,
+  generateRecipientsKeys,
+} from "blockchain/utils";
+import { hex as commitmentContractHex } from "blockchain/commitment";
+import { Address, Cell, toNano } from "@ton/core";
 
 export default function Create() {
   const wallet = useTonWallet();
@@ -25,6 +30,8 @@ export default function Create() {
   const [description, setDescription] = useState("");
   const [stakeAmount, setStakeAmount] = useState<number | null>(null);
   const [recepientsCount, setRecepientsCount] = useState<number | null>(null);
+  const [createdCommitmentAddress, setCreatedCommitmentAddress] =
+    useState<string>("");
 
   const commiterContract = useCommiterContract();
   const { sender } = useTonSender();
@@ -61,8 +68,10 @@ export default function Create() {
     setIsWalletModalOpen(true);
   }, []);
 
-  const createCommitment = async () => {
-    if (commiterContract && stakeAmount && recepientsCount) {
+  const handleCreateClicked = async () => {
+    if (!wallet) {
+      openWalletModal();
+    } else if (commiterContract && recepientsCount && stakeAmount) {
       const dueDateSeconds = Math.floor(dueDate.getTime() / 1000);
       const recipientNumbers = Array.from({ length: recepientsCount }, (_, i) =>
         (i + 1).toString()
@@ -79,14 +88,24 @@ export default function Create() {
         recipientsKeys.length,
         toNano(stakeAmount.toString())
       );
-    }
-  };
 
-  const handleCreateClicked = () => {
-    if (!wallet) {
-      openWalletModal();
-    } else {
-      void createCommitment();
+      const commitmentCodeCell = Cell.fromBoc(
+        Buffer.from(commitmentContractHex, "hex")
+      )[0];
+
+      const commitmentContract = await CommitmentContract.createFromConfig(
+        {
+          stakerAddress: Address.parse(wallet.account.address),
+          title: title,
+          description: description,
+          dueDate: dueDateSeconds,
+          recipientsList: recipientsKeyList,
+          recipientsCount: recipientsKeys.length,
+        },
+        commitmentCodeCell
+      );
+
+      setCreatedCommitmentAddress(commitmentContract.address.toString());
     }
   };
 
@@ -119,13 +138,13 @@ export default function Create() {
         <DecimalInput
           value={stakeAmount}
           onChange={setStakeAmount}
-          min={10}
+          min={1}
           max={100}
           round={2}
           label={t("stake.label")}
           placeholder={t("stake.placeholder")}
           naNError={t("stake.error.isNaN")}
-          minError={t("stake.error.minError", { min: 10 })}
+          minError={t("stake.error.minError", { min: 1 })}
           maxError={t("stake.error.maxError", { max: 100 })}
           good={t("stake.good")}
           // TON icon
@@ -184,7 +203,7 @@ export default function Create() {
             !title.trim() ||
             !description.trim() ||
             stakeAmount === null ||
-            stakeAmount < 10 ||
+            stakeAmount < 1 ||
             stakeAmount > 100 ||
             recepientsCount === null ||
             recepientsCount < 1 ||
@@ -196,6 +215,9 @@ export default function Create() {
         >
           {t("create")}
         </Button>
+        {createdCommitmentAddress && (
+          <div className="text-center">{createdCommitmentAddress}</div>
+        )}
       </div>
       <Modal
         modalClassName="w-90 space-y-4 flex flex-col items-center"

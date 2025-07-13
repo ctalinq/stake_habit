@@ -1,5 +1,5 @@
 import { Address, type OpenedContract } from "@ton/core";
-import { CommiterContract } from "blockchain";
+import { CommiterContract } from "blockchain/commiterContract";
 import { useCallback, useEffect, useState } from "react";
 import { useTonClient } from "~/contexts/useTonClient";
 
