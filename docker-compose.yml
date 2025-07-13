@@ -3,8 +3,8 @@ version: "3.8"
 services:
   client:
     environment:
-      VITE_COMMITER_CONTRACT_ADDRESS: ${VITE_COMMITER_CONTRACT_ADDRESS}
-      VITE_TON_NETWORK: ${VITE_TON_NETWORK}
+      - VITE_COMMITER_CONTRACT_ADDRESS
+      - VITE_TON_NETWORK
     build:
       context: .
       dockerfile: ./client/Dockerfile
