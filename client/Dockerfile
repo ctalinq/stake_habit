@@ -5,4 +5,5 @@ COPY client/package*.json ./client/
 COPY blockchain/package*.json ./blockchain/
 RUN npm install
 COPY . .
+RUN npm run compile
 RUN npm run build
