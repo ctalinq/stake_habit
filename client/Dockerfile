@@ -3,7 +3,6 @@ WORKDIR /app
 COPY package*.json ./
 COPY client/package*.json ./client/
 COPY blockchain/package*.json ./blockchain/
-RUN echo sss
 RUN npm install
 COPY . .
 RUN npm run compile
