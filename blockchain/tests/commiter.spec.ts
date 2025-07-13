@@ -14,6 +14,10 @@ import { compile } from "@ton/blueprint";
 import { CommiterContract } from "../wrappers/CommiterContract";
 import { CommitmentContract } from "../wrappers/CommitmentContract";
 import {
+  generateRecipientsKeyList,
+  generateRecipientsKeys,
+} from "../wrappers/utils";
+import {
   emptyTitle,
   notEnoughStake,
   recipientIds,
@@ -29,7 +33,6 @@ import {
   validStake,
   validTitle,
 } from "./mocks";
-import { generateRecipientsKeyList, generateRecipientsKeys } from "../utils";
 import {
   compareTransaction,
   flattenTransaction,

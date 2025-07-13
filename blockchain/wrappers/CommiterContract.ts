@@ -10,10 +10,10 @@ import {
   toNano,
 } from "@ton/core";
 
-const EXECUTION_FEE: bigint = toNano("0.025")
-const COMMITMENT_DEPLOYMENT_FEE: bigint = toNano("0.025")
-const COMMITMENT_EXECUTION_FEE: bigint = toNano("0.005")
-const INTEREST_FEE: bigint = toNano("0.33")
+const EXECUTION_FEE: bigint = toNano("0.025");
+const COMMITMENT_DEPLOYMENT_FEE: bigint = toNano("0.025");
+const COMMITMENT_EXECUTION_FEE: bigint = toNano("0.005");
+const INTEREST_FEE: bigint = toNano("0.33");
 
 export type CommiterContractConfig = {
   commitment_code: Cell;
@@ -25,7 +25,7 @@ enum OP {
 }
 
 export function commiterContractConfigToCell(
-  config: CommiterContractConfig,
+  config: CommiterContractConfig
 ): Cell {
   return beginCell()
     .storeAddress(config.owner_address)
@@ -36,13 +36,13 @@ export function commiterContractConfigToCell(
 export class CommiterContract implements Contract {
   constructor(
     readonly address: Address,
-    readonly init?: { code: Cell; data: Cell },
+    readonly init?: { code: Cell; data: Cell }
   ) {}
 
   static async createFromConfig(
     config: CommiterContractConfig,
     code: Cell,
-    workchain = 0,
+    workchain = 0
   ) {
     const data = commiterContractConfigToCell(config);
     const init = { code, data };
@@ -59,13 +59,14 @@ export class CommiterContract implements Contract {
     dueDate: number,
     recipientsList: Cell,
     recipientsCount: number,
-    stake: bigint,
+    stake: bigint
   ) {
-    const value_to_send = stake
-        + EXECUTION_FEE * BigInt(2)
-        + COMMITMENT_DEPLOYMENT_FEE * BigInt(2)
-        + INTEREST_FEE
-        + COMMITMENT_EXECUTION_FEE * BigInt(recipientsCount)
+    const value_to_send =
+      stake +
+      EXECUTION_FEE * BigInt(2) +
+      COMMITMENT_DEPLOYMENT_FEE * BigInt(2) +
+      INTEREST_FEE +
+      COMMITMENT_EXECUTION_FEE * BigInt(recipientsCount);
 
     const msg_body = beginCell()
       .storeUint(OP.COMMIT, 32)
@@ -83,7 +84,15 @@ export class CommiterContract implements Contract {
   }
 
   async getBalance(provider: ContractProvider) {
-    const {stack} = await provider.get("balance", [])
-    return stack.readNumber()
+    const { stack } = await provider.get("balance", []);
+    return stack.readNumber();
+  }
+
+  async sendDeploy(provider: ContractProvider, via: Sender, value: bigint) {
+    await provider.internal(via, {
+      value,
+      sendMode: SendMode.PAY_GAS_SEPARATELY,
+      body: beginCell().endCell(),
+    });
   }
 }

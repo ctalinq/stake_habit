@@ -10,9 +10,10 @@ import type { Route } from "./+types/root";
 import { MODAL_ROOT_ID } from "./const";
 import "./app.css";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import { Container, Card, GradientText } from "./components";
 import HomeSkeleton from "~/home/homeSkeleton";
+import { Buffer } from "buffer";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -28,6 +29,10 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  useEffect(() => {
+    window.Buffer = Buffer;
+  }, []);
+
   return (
     <html lang="en">
       <head>

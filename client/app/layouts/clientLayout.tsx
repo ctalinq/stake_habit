@@ -7,9 +7,7 @@ import HomeSkeleton from "~/home/homeSkeleton";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { ThemeProvider } from "~/contexts/useTheme";
 import { AppRoot } from "@telegram-apps/telegram-ui";
-import { Buffer } from "buffer";
-
-window.Buffer = Buffer;
+import { TonClientProvider } from "~/contexts/useTonClient";
 
 //todo - to env
 const manifestUrl = "https://sh.devalchemy.online/manifest.json";
@@ -40,9 +38,11 @@ export default function ClientLayout() {
   return (
     <AppRoot>
       <TonConnectUIProvider manifestUrl={manifestUrl}>
-        <ThemeProvider>
-          <Outlet />
-        </ThemeProvider>
+        <TonClientProvider>
+          <ThemeProvider>
+            <Outlet />
+          </ThemeProvider>
+        </TonClientProvider>
       </TonConnectUIProvider>
     </AppRoot>
   );

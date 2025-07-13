@@ -20,8 +20,8 @@ export const tooEarlyDueDate = now + 3 * 60 * 60;
 //more than 90 days
 export const tooLateDueDate = now + 91 * 24 * 60 * 60;
 
-export const validStake = toNano("10");
-export const notEnoughStake = toNano("2.99");
+export const validStake = toNano("1.00");
+export const notEnoughStake = toNano("0.99");
 export const tooManyStake = toNano("100.1");
 
 export const recipientIds = Array.from({ length: 100 }, (_, i) =>

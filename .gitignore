@@ -1,6 +1,7 @@
 .idea
 .turbo
 node_modules
+temp
 build
 dist
 coverage
