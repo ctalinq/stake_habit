@@ -1,4 +1,7 @@
 name: Deployment
+env:
+  VITE_COMMITER_CONTRACT_ADDRESS: ${{ vars.VITE_COMMITER_CONTRACT_ADDRESS }}
+  VITE_TON_NETWORK: ${{ vars.VITE_TON_NETWORK }}
 
 on:
   push:
@@ -12,9 +15,6 @@ jobs:
       - name: Clone step - clone and check out repository
         uses: actions/checkout@v4
       - name: Build client docker image
-        env:
-          VITE_COMMITER_CONTRACT_ADDRESS: ${{ secrets.VITE_COMMITER_CONTRACT_ADDRESS }}
-          VITE_TON_NETWORK: ${{ secrets.VITE_TON_NETWORK }}
         run: DOCKER_BUILDKIT=0 docker compose build --no-cache --memory=2g
 
   deploy:
