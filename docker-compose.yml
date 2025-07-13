@@ -5,5 +5,8 @@ services:
     build:
       context: .
       dockerfile: ./client/Dockerfile
+      args:
+        VITE_COMMITER_CONTRACT_ADDRESS: ${VITE_COMMITER_CONTRACT_ADDRESS}
+        VITE_TON_NETWORK: ${VITE_TON_NETWORK}
     ports:
       - "5173:5173"
