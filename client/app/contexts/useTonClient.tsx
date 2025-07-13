@@ -17,7 +17,6 @@ export const TonClientProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  console.log(import.meta.env.VITE_TON_NETWORK);
   const [tonClient, setTonClient] = useState<{ client: TonClient | null }>({
     client: null,
   });
