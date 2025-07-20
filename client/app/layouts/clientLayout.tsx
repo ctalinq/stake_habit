@@ -8,9 +8,9 @@ import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { ThemeProvider } from "~/contexts/useTheme";
 import { AppRoot } from "@telegram-apps/telegram-ui";
 import { TonClientProvider } from "~/contexts/useTonClient";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-//todo - to env
-const manifestUrl = "https://sh.devalchemy.online/manifest.json";
+const queryClient = new QueryClient();
 
 export default function ClientLayout() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -37,13 +37,15 @@ export default function ClientLayout() {
 
   return (
     <AppRoot>
-      <TonConnectUIProvider manifestUrl={manifestUrl}>
-        <TonClientProvider>
-          <ThemeProvider>
-            <Outlet />
-          </ThemeProvider>
-        </TonClientProvider>
-      </TonConnectUIProvider>
+      <QueryClientProvider client={queryClient}>
+        <TonConnectUIProvider manifestUrl={import.meta.env.VITE_MANIFEST_URL}>
+          <TonClientProvider>
+            <ThemeProvider>
+              <Outlet />
+            </ThemeProvider>
+          </TonClientProvider>
+        </TonConnectUIProvider>
+      </QueryClientProvider>
     </AppRoot>
   );
 }
