@@ -10,3 +10,40 @@ services:
         VITE_TON_NETWORK: ${VITE_TON_NETWORK}
     ports:
       - "5173:5173"
+
+  postgres:
+    image: postgres:16
+    container_name: pg
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: stake_habit
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - stake_habit
+
+  migrate:
+    image: migrate/migrate
+    networks:
+      - stake_habit
+    volumes:
+      - ./tg-bot/migrations:/migrations
+    command:
+      [
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://postgres:postgres@postgres:5432/stake_habit?sslmode=disable",
+        "up",
+      ]
+    links:
+      - postgres
+
+volumes:
+  pgdata:
+
+networks:
+  stake_habit:

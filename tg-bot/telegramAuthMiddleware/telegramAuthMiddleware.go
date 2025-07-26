@@ -2,6 +2,7 @@ package telegramAuthMiddeware
 
 import (
 	"context"
+	"os"
 	"strings"
 	"time"
 
@@ -15,13 +16,20 @@ const (
 	_initDataKey contextKey = "init-data"
 )
 
+func CtxInitData(ctx context.Context) (initdata.InitData, bool) {
+	initData, ok := ctx.Value(_initDataKey).(initdata.InitData)
+	return initData, ok
+}
+
 // Returns new context with specified init data.
 func withInitData(ctx context.Context, initData initdata.InitData) context.Context {
 	return context.WithValue(ctx, _initDataKey, initData)
 }
 
 // Middleware which authorizes the external client.
-func AuthMiddleware(token string) gin.HandlerFunc {
+func AuthMiddleware() gin.HandlerFunc {
+	token := os.Getenv("TELEGRAM_BOT_TOKEN")
+
 	return func(context *gin.Context) {
 		// We expect passing init data in the Authorization header in the following format:
 		// <auth-type> <auth-data>
@@ -41,7 +49,7 @@ func AuthMiddleware(token string) gin.HandlerFunc {
 		case "tma":
 			// Validate init data. We consider init data sign valid for 1 hour from their
 			// creation moment.
-			if err := initdata.Validate(authData, token, time.Hour); err != nil {
+			if err := initdata.Validate(authData, token, time.Hour*1000); err != nil {
 				context.AbortWithStatusJSON(401, map[string]any{
 					"message": err.Error(),
 				})

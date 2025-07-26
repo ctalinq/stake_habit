@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -21,20 +21,81 @@ import {
 } from "blockchain/utils";
 import { hex as commitmentContractHex } from "blockchain/commitment";
 import { Address, Cell, toNano } from "@ton/core";
+import { useMutation } from "@tanstack/react-query";
+import { useRawInitData } from "@telegram-apps/sdk-react";
+import ShareKeysModal from "./shareKeysModal";
+import { useCommitmentContract } from "./hooks/useCommitmentContract";
+import Spinner from "./icons/spinner.svg?react";
 
 export default function Create() {
   const wallet = useTonWallet();
+  const initData = useRawInitData();
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const { t } = useTranslation("create");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [stakeAmount, setStakeAmount] = useState<number | null>(null);
   const [recepientsCount, setRecepientsCount] = useState<number | null>(null);
-  const [createdCommitmentAddress, setCreatedCommitmentAddress] =
-    useState<string>("");
+  const [recepientKeys, setRecepientKeys] = useState<string[] | null>(null);
 
-  const commiterContract = useCommiterContract();
   const { sender } = useTonSender();
+  const commiterContract = useCommiterContract();
+
+  const [createdCommitmentAddress, setCreatedCommitmentAddress] =
+    useState<Address | null>(null);
+  const commitmentContract = useCommitmentContract(createdCommitmentAddress);
+  const [commitmentInfo, setCommitmentInfo] = useState<{
+    title: string;
+  } | null>(null);
+
+  const { data: messageIds, mutateAsync: saveCommitment } = useMutation({
+    mutationFn: async ({
+      recepientKeys,
+      address,
+    }: {
+      recepientKeys: string[];
+      address: string;
+    }) => {
+      const response = await fetch(
+        `/api/wallets/${sender?.address?.toString()}/commitments`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `tma ${initData}`,
+          },
+          body: JSON.stringify({
+            commitment_address: address,
+            recipient_keys: recepientKeys,
+          }),
+        }
+      );
+      return response.json();
+    },
+  });
+
+  const checkCommitmenIdDeployed = async () => {
+    if (commitmentContract && createdCommitmentAddress) {
+      try {
+        const info = await commitmentContract.getInfo();
+        setCommitmentInfo(info);
+
+        if (recepientKeys) {
+          await saveCommitment({
+            recepientKeys,
+            address: createdCommitmentAddress.toString(),
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        setTimeout(checkCommitmenIdDeployed, 4000);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (commitmentContract) setTimeout(checkCommitmenIdDeployed, 4000);
+  }, [commitmentContract]);
 
   const today = useMemo(() => {
     return startOfDay(new Date());
@@ -79,7 +140,7 @@ export default function Create() {
       const recipientsKeys = await generateRecipientsKeys(recipientNumbers);
       const recipientsKeyList = generateRecipientsKeyList(recipientsKeys);
 
-      commiterContract.sendCommitment(
+      await commiterContract.sendCommitment(
         sender,
         title,
         description,
@@ -105,7 +166,8 @@ export default function Create() {
         commitmentCodeCell
       );
 
-      setCreatedCommitmentAddress(commitmentContract.address.toString());
+      setCreatedCommitmentAddress(commitmentContract.address);
+      setRecepientKeys(recipientsKeys);
     }
   };
 
@@ -215,9 +277,6 @@ export default function Create() {
         >
           {t("create")}
         </Button>
-        {createdCommitmentAddress && (
-          <div className="text-center">{createdCommitmentAddress}</div>
-        )}
       </div>
       <Modal
         modalClassName="w-90 space-y-4 flex flex-col items-center"
@@ -228,6 +287,17 @@ export default function Create() {
         <div className="text-center">{t("walletModal.description")}</div>
         <TonConnectButton onConnectStart={closeWalletModal} />
       </Modal>
+      <Modal
+        modalClassName="w-90 space-y-4 flex flex-col items-center"
+        isOpen={!commitmentInfo && !!createdCommitmentAddress}
+        onClose={() => {}}
+      >
+        <p className="text-center mb-9">
+          {t("commitmentDeploymentModal.text")}
+        </p>
+        <Spinner />
+      </Modal>
+      <ShareKeysModal messageIds={messageIds} />
     </Card>
   );
 }
