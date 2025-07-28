@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { Button, Modal } from "~/components";
 import { shareMessage } from "@telegram-apps/sdk-react";
 import { useTranslation } from "react-i18next";
-import Spinner from "./icons/spinner.svg?react";
+import Spinner from "~/components/icons/spinner.svg?react";
 
 interface ShareKeysModalProps {
   messageIds?: string[];

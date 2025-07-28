@@ -9,7 +9,7 @@ export const useCommitmentContract = (address: Address | null) => {
     useState<OpenedContract<CommitmentContract> | null>(null);
 
   useEffect(() => {
-    if (tonClient && address) {
+    if (tonClient && address && !commitmentContract) {
       const contract = new CommitmentContract(address);
 
       setCommitmentContract(

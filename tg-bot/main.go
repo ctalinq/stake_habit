@@ -4,7 +4,8 @@ import (
 	"tg-bot/infra/bot"
 	"tg-bot/infra/db"
 	telegramAuthMiddeware "tg-bot/telegramAuthMiddleware"
-	"tg-bot/useCases/getCommitments"
+	"tg-bot/useCases/getCommitmentByAddress"
+	"tg-bot/useCases/getCommitmentsByWalletId"
 	"tg-bot/useCases/saveCommitment"
 
 	"github.com/gin-gonic/gin"
@@ -27,10 +28,12 @@ func main() {
 	r.Use(telegramAuthMiddeware.AuthMiddleware())
 
 	saveCommitment := saveCommitment.NewSaveCommitmentUserCase(db, b)
-	getCommitments := getCommitments.NewGetCommitmentsUserCase(db)
+	getCommitments := getCommitmentsByWalletId.NewGetCommitmentsUserCase(db)
+	getCommitment := getCommitmentByAddress.NewGetCommitmentUserCase(db)
 
 	r.POST("/wallets/:walletId/commitments", saveCommitment.SaveCommitment)
-	r.GET("/wallets/:walletId/commitments", getCommitments.GetCommitments)
+	r.GET("/wallets/:walletId/commitments", getCommitments.GetCommitmentsByWalletId)
+	r.GET("/commitments/:address", getCommitment.GetCommitmentByAddress)
 
 	r.Run(":5174")
 }

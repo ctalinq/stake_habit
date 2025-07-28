@@ -1,6 +1,7 @@
 package saveCommitment
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -47,6 +48,10 @@ func (s *SaveCommitmentUserCase) SaveCommitment(c *gin.Context) {
 	linkPrefix := os.Getenv("COMMITMENT_LINK_PREFIX")
 
 	for index, key := range commitment.RecipientKeys {
+		linkPostfix := fmt.Sprintf("commitment=%s;key=%s", commitment.CommitmentAddress, key)
+		encodedLinkPostfix := base64.StdEncoding.EncodeToString([]byte(linkPostfix))
+		url := fmt.Sprintf("%s%s", linkPrefix, encodedLinkPostfix)
+
 		preparedMessage, _ := s.BOT.SavePreparedInlineMessage(initData.User.ID,
 			&gotgbot.InlineQueryResultArticle{
 				Id:    strconv.Itoa(index),
@@ -58,8 +63,8 @@ func (s *SaveCommitmentUserCase) SaveCommitment(c *gin.Context) {
 					InlineKeyboard: [][]gotgbot.InlineKeyboardButton{
 						{
 							{
-								Text: "Click to open app",
-								Url:  fmt.Sprintf("%s/%s?key=%s", linkPrefix, commitment.CommitmentAddress, key),
+								Text: "Click button to open app",
+								Url:  url,
 							},
 						},
 					},
@@ -74,7 +79,7 @@ func (s *SaveCommitmentUserCase) SaveCommitment(c *gin.Context) {
 		messageIds = append(messageIds, preparedMessage.Id)
 	}
 
-	_, dbErr := s.DB.Exec("INSERT INTO commitments (wallet_id, commitment_address) VALUES ($1, $2)", walletId, commitment.CommitmentAddress)
+	_, dbErr := s.DB.Exec("INSERT INTO commitments (wallet_id, tg_user_photo_link, commitment_address) VALUES ($1, $2, $3)", walletId, initData.User.PhotoURL, commitment.CommitmentAddress)
 	if dbErr != nil {
 		log.Println("Db: ", dbErr)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})

@@ -49,6 +49,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		case "tma":
 			// Validate init data. We consider init data sign valid for 1 hour from their
 			// creation moment.
+			// todo - remove
 			if err := initdata.Validate(authData, token, time.Hour*1000); err != nil {
 				context.AbortWithStatusJSON(401, map[string]any{
 					"message": err.Error(),

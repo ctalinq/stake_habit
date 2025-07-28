@@ -1,4 +1,4 @@
-package getCommitments
+package getCommitmentsByWalletId
 
 import (
 	"log"
@@ -10,6 +10,7 @@ import (
 
 type CommitmentDTO struct {
 	WalletId          string `db:"wallet_id" json:"wallet_id" binding:"required"`
+	UserPhotoURL      string `db:"tg_user_photo_link" json:"tg_user_photo_link"`
 	CommitmentAddress string `db:"commitment_address" json:"commitment_address" binding:"required"`
 }
 
@@ -21,7 +22,7 @@ func NewGetCommitmentsUserCase(db *sqlx.DB) *GetCommitmentsUseCase {
 	return &GetCommitmentsUseCase{DB: db}
 }
 
-func (s *GetCommitmentsUseCase) GetCommitments(c *gin.Context) {
+func (s *GetCommitmentsUseCase) GetCommitmentsByWalletId(c *gin.Context) {
 	var commitments []CommitmentDTO
 	walletId := c.Param("walletId")
 

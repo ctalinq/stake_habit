@@ -8,12 +8,13 @@ import {
   DatePicker,
   TextInput,
   Modal,
-} from "../components";
+} from "~/components";
+import Spinner from "~/components/icons/spinner.svg?react";
 import { startOfDay } from "~/util";
 import { TonConnectButton } from "~/containers";
 import { useTonWallet } from "@tonconnect/ui-react";
-import { useCommiterContract } from "./hooks/useCommiterContract";
-import { useTonSender } from "./hooks/useTonSender";
+import { useCommiterContract } from "../hooks/useCommiterContract";
+import { useTonSender } from "../hooks/useTonSender";
 import { CommitmentContract } from "blockchain/commitmentContract";
 import {
   generateRecipientsKeyList,
@@ -24,8 +25,7 @@ import { Address, Cell, toNano } from "@ton/core";
 import { useMutation } from "@tanstack/react-query";
 import { useRawInitData } from "@telegram-apps/sdk-react";
 import ShareKeysModal from "./shareKeysModal";
-import { useCommitmentContract } from "./hooks/useCommitmentContract";
-import Spinner from "./icons/spinner.svg?react";
+import { useCommitmentContract } from "../hooks/useCommitmentContract";
 
 export default function Create() {
   const wallet = useTonWallet();
