@@ -1,4 +1,4 @@
-package getCommitmentsByWalletId
+package getCommitmentsByWalletAddress
 
 import (
 	"log"
@@ -9,7 +9,7 @@ import (
 )
 
 type CommitmentDTO struct {
-	WalletId          string `db:"wallet_id" json:"wallet_id" binding:"required"`
+	WalletAddress     string `db:"wallet_address" json:"wallet_address" binding:"required"`
 	UserPhotoURL      string `db:"tg_user_photo_link" json:"tg_user_photo_link"`
 	CommitmentAddress string `db:"commitment_address" json:"commitment_address" binding:"required"`
 }
@@ -22,11 +22,11 @@ func NewGetCommitmentsUserCase(db *sqlx.DB) *GetCommitmentsUseCase {
 	return &GetCommitmentsUseCase{DB: db}
 }
 
-func (s *GetCommitmentsUseCase) GetCommitmentsByWalletId(c *gin.Context) {
+func (s *GetCommitmentsUseCase) GetCommitmentsByWalletAddress(c *gin.Context) {
 	var commitments []CommitmentDTO
-	walletId := c.Param("walletId")
+	walletAddress := c.Param("address")
 
-	err := s.DB.Select(&commitments, "SELECT * FROM commitments WHERE wallet_id = $1", walletId)
+	err := s.DB.Select(&commitments, "SELECT * FROM commitments WHERE wallet_address = $1", walletAddress)
 	if err != nil {
 		log.Println("Db: ", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})

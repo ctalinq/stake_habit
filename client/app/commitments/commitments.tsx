@@ -49,6 +49,21 @@ function Commitment({
     },
   });
 
+  useQuery({
+    queryKey: ["commitment_visit"],
+    queryFn: () => {
+      return fetch(
+        `/api/commitments/${commitmentContract?.address?.toString()}/visits`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `tma ${initData}`,
+          },
+        }
+      );
+    },
+  });
+
   const formatDate = useCallback((timeMs: number) => {
     const date = new Date(timeMs * 1000);
 
