@@ -8,6 +8,7 @@
     "compile": "turbo compile",
     "build": "turbo run build",
     "test": "turbo test",
+    "test:watch": "turbo test:watch",
     "prepare": "husky",
     "lint": "turbo lint"
   },
