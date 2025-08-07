@@ -155,22 +155,24 @@ function CommitmentRow({
       ) : (
         <div className="w-54 h-6 skeleton" />
       )}
-      <div className="absolute right-0 top-14 flex items-center">
-        <p className="text-sm text-gray-500 mr-4">{t("viewers")}</p>
-        {commitment.users.map((user) => (
-          <>
-            <div key={user.full_name} style={{ marginLeft: "-10px" }}>
-              {user.photo_url && (
-                <img
-                  src={user.photo_url}
-                  alt={user.full_name}
-                  className="w-7 h-7 rounded-full"
-                />
-              )}
-            </div>
-          </>
-        ))}
-      </div>
+      {commitment.users.length > 0 && (
+        <div className="absolute right-0 top-14 flex items-center">
+          <p className="text-sm text-gray-500 mr-4">{t("viewers")}</p>
+          {commitment.users.map((user) => (
+            <>
+              <div key={user.full_name} style={{ marginLeft: "-10px" }}>
+                {user.photo_url && (
+                  <img
+                    src={user.photo_url}
+                    alt={user.full_name}
+                    className="w-7 h-7 rounded-full"
+                  />
+                )}
+              </div>
+            </>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

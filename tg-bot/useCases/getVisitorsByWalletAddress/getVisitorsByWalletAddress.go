@@ -42,12 +42,14 @@ func (s *GetVisitorsByWalletAddressUseCase) GetVisitorsByWalletAddress(c *gin.Co
 	//todo BUG: commitment will be null if there are no visitors!
 	query := `
 		SELECT
-			visitors.tg_user_id,
-			visitors.tg_user_full_name,
-			visitors.tg_user_photo_link,
-			visitors.commitment_address FROM visitors
+  			COALESCE(visitors.tg_user_id, 0) AS tg_user_id,
+    		COALESCE(visitors.tg_user_full_name, '') AS tg_user_full_name,
+    		COALESCE(visitors.tg_user_photo_link, '') AS tg_user_photo_link,
+			commitments.commitment_address
+		FROM
+			commitments
 		LEFT JOIN
-			commitments ON visitors.commitment_address = commitments.commitment_address
+			visitors ON visitors.commitment_address = commitments.commitment_address
 		WHERE
 			commitments.wallet_address = $1
 	`
@@ -73,8 +75,14 @@ func (s *GetVisitorsByWalletAddressUseCase) GetVisitorsByWalletAddress(c *gin.Co
 				user,
 			}
 
-			commitment = CommitmentDTO{
-				Users: users,
+			if user.FullName != "" {
+				commitment = CommitmentDTO{
+					Users: users,
+				}
+			} else {
+				commitment = CommitmentDTO{
+					Users: []UserDTO{},
+				}
 			}
 		} else {
 			commitment.Users = append(commitment.Users, user)
