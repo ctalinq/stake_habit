@@ -26,6 +26,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRawInitData } from "@telegram-apps/sdk-react";
 import ShareKeysModal from "./shareKeysModal";
 import { useCommitmentContract } from "../hooks/useCommitmentContract";
+import { useNavigate } from "react-router";
 
 export default function Create() {
   const wallet = useTonWallet();
@@ -37,6 +38,8 @@ export default function Create() {
   const [stakeAmount, setStakeAmount] = useState<number | null>(null);
   const [recepientsCount, setRecepientsCount] = useState<number | null>(null);
   const [recepientKeys, setRecepientKeys] = useState<string[] | null>(null);
+  const [messagesWereSent, setMessagesWereSent] = useState(false);
+  const navigate = useNavigate();
 
   const { sender } = useTonSender();
   const commiterContract = useCommiterContract();
@@ -83,13 +86,7 @@ export default function Create() {
       try {
         const info = await commitmentContract.getInfo();
         setCommitmentInfo(info);
-
-        if (recepientKeys) {
-          await saveCommitment({
-            recepientKeys,
-            address: createdCommitmentAddress.toString(),
-          });
-        }
+        navigate("/");
       } catch (error) {
         console.error(error);
         setTimeout(checkCommitmenIdDeployed, 4000);
@@ -133,6 +130,48 @@ export default function Create() {
     setIsWalletModalOpen(true);
   }, []);
 
+  const handleMessagesSent = async () => {
+    setMessagesWereSent(true);
+
+    if (!wallet) {
+      openWalletModal();
+    } else if (commiterContract && recepientKeys && stakeAmount) {
+      const dueDateSeconds = Math.floor(dueDate.getTime() / 1000);
+      const recipientsKeyList = generateRecipientsKeyList(recepientKeys);
+
+      await commiterContract.sendCommitment(
+        sender,
+        title,
+        description,
+        dueDateSeconds,
+        recipientsKeyList,
+        recepientKeys.length,
+        toNano(stakeAmount.toString())
+      );
+
+      //todo - remove duplication
+      const commitmentCodeCell = Cell.fromBoc(
+        Buffer.from(commitmentContractHex, "hex")
+      )[0];
+
+      const commitmentContract = await CommitmentContract.createFromConfig(
+        {
+          stakerAddress: Address.parse(wallet.account.address),
+          title: title,
+          description: description,
+          dueDate: dueDateSeconds,
+          recipientsList: recipientsKeyList,
+          recipientsCount: recepientKeys.length,
+        },
+        commitmentCodeCell
+      );
+
+      setCreatedCommitmentAddress(commitmentContract.address);
+    }
+  };
+
+  const isMessagesDialogOpen = !commitmentInfo && !!createdCommitmentAddress;
+
   const handleCreateClicked = async () => {
     if (!wallet) {
       openWalletModal();
@@ -143,16 +182,6 @@ export default function Create() {
       );
       const recipientsKeys = await generateRecipientsKeys(recipientNumbers);
       const recipientsKeyList = generateRecipientsKeyList(recipientsKeys);
-
-      await commiterContract.sendCommitment(
-        sender,
-        title,
-        description,
-        dueDateSeconds,
-        recipientsKeyList,
-        recipientsKeys.length,
-        toNano(stakeAmount.toString())
-      );
 
       const commitmentCodeCell = Cell.fromBoc(
         Buffer.from(commitmentContractHex, "hex")
@@ -170,8 +199,12 @@ export default function Create() {
         commitmentCodeCell
       );
 
-      setCreatedCommitmentAddress(commitmentContract.address);
       setRecepientKeys(recipientsKeys);
+
+      await saveCommitment({
+        recepientKeys: recipientsKeys,
+        address: commitmentContract.address.toString(),
+      });
     }
   };
 
@@ -292,8 +325,9 @@ export default function Create() {
         <TonConnectButton onConnectStart={closeWalletModal} />
       </Modal>
       <Modal
+        showCloseButton={false}
         modalClassName="w-90 space-y-4 flex flex-col items-center"
-        isOpen={!commitmentInfo && !!createdCommitmentAddress}
+        isOpen={isMessagesDialogOpen}
         onClose={() => {}}
       >
         <p className="text-center mb-9">
@@ -301,7 +335,10 @@ export default function Create() {
         </p>
         <Spinner />
       </Modal>
-      <ShareKeysModal messageIds={messageIds} />
+      <ShareKeysModal
+        onReady={handleMessagesSent}
+        messageIds={messagesWereSent ? undefined : messageIds}
+      />
     </Card>
   );
 }

@@ -6,27 +6,34 @@ import Spinner from "~/components/icons/spinner.svg?react";
 
 interface ShareKeysModalProps {
   messageIds?: string[];
+  onReady: () => void;
 }
 
 interface ShareKeysModalContentProps {
   messageIds: string[];
+  onReady: () => void;
 }
 
-function ShareKeysModalContent({ messageIds }: ShareKeysModalContentProps) {
+function ShareKeysModalContent({
+  messageIds,
+  onReady,
+}: ShareKeysModalContentProps) {
   const { t } = useTranslation("create");
   const [keyNumber, setKeyNumber] = useState(0);
-  //todo - redirect to main page
-  const [, setIsFinished] = useState(false);
   const keyNumberRef = useRef(0);
 
   const stepOn = async () => {
     setKeyNumber(keyNumberRef.current + 1);
     keyNumberRef.current = keyNumberRef.current + 1;
 
-    if (keyNumberRef.current > messageIds.length) return setIsFinished(true);
-
-    await shareMessage(messageIds[keyNumberRef.current - 1]);
-    setTimeout(stepOn, 3000);
+    try {
+      await shareMessage(messageIds[keyNumberRef.current - 1]);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      if (keyNumberRef.current >= messageIds.length) onReady();
+      else setTimeout(stepOn, 3000);
+    }
   };
 
   if (keyNumber === 0)
@@ -62,7 +69,10 @@ function ShareKeysModalContent({ messageIds }: ShareKeysModalContentProps) {
   );
 }
 
-export default function ShareKeysModal({ messageIds }: ShareKeysModalProps) {
+export default function ShareKeysModal({
+  messageIds,
+  onReady,
+}: ShareKeysModalProps) {
   return (
     <Modal
       showCloseButton={false}
@@ -70,7 +80,9 @@ export default function ShareKeysModal({ messageIds }: ShareKeysModalProps) {
       isOpen={messageIds ? messageIds.length > 0 : false}
       onClose={() => {}}
     >
-      {messageIds && <ShareKeysModalContent messageIds={messageIds} />}
+      {messageIds && (
+        <ShareKeysModalContent onReady={onReady} messageIds={messageIds} />
+      )}
     </Modal>
   );
 }
