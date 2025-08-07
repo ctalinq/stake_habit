@@ -16,8 +16,8 @@ function LoadingPlaceholder() {
 
   return (
     <div className="pt-10 flex flex-col items-center">
-      <p className="text-3xl mb-8">{t("loading")}</p>
-      <Spinner width={80} height={80} />
+      <p className="text-3xl mb-8 text-black dark:text-white">{t("loading")}</p>
+      <Spinner className="fill-black dark:fill-white" width={80} height={80} />
     </div>
   );
 }
@@ -105,12 +105,17 @@ function Commitment({
               alt="User Avatar"
               className="w-12 h-12 avatar-ring mr-3 mb-6"
             />
-            <TruncatedText maxLength={15} className="text-4xl mb-2">
+            <TruncatedText
+              maxLength={15}
+              className="text-4xl mb-2 text-black dark:text-white"
+            >
               {commitmentData.title}
             </TruncatedText>
           </div>
-          <p className="mb-4">{commitmentData.description}</p>
-          <p className="mb-5">
+          <p className="mb-4 text-black dark:text-white">
+            {commitmentData.description}
+          </p>
+          <p className="mb-5 text-black dark:text-white">
             {t("due", { date: formatDate(commitmentData.dueDate) })}
           </p>
           <CommitmentStatus

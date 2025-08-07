@@ -40,6 +40,7 @@ export default function Home() {
           <Link
             to="/create"
             className="block w-full btn-base btn-primary text-center py-3 px-4"
+            viewTransition
           >
             {t("commit")}
           </Link>
@@ -47,7 +48,7 @@ export default function Home() {
       </Card>
       {commitements && Object.keys(commitements).length > 0 && (
         <Card className="space-y-16 pb-18">
-          <h2 className="text-xl font-bold mb-4">
+          <h2 className="text-xl text-blue-400 dark:text-white font-bold mb-4">
             {t("yourCommitments.title")}
           </h2>
           {Object.entries(commitements)

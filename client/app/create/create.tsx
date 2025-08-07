@@ -170,7 +170,7 @@ export default function Create() {
     }
   };
 
-  const isMessagesDialogOpen = !commitmentInfo && !!createdCommitmentAddress;
+  const isDeployModalOpen = !commitmentInfo && !!createdCommitmentAddress;
 
   const handleCreateClicked = async () => {
     if (!wallet) {
@@ -327,13 +327,13 @@ export default function Create() {
       <Modal
         showCloseButton={false}
         modalClassName="w-90 space-y-4 flex flex-col items-center"
-        isOpen={isMessagesDialogOpen}
+        isOpen={isDeployModalOpen}
         onClose={() => {}}
       >
-        <p className="text-center mb-9">
+        <p className="text-center mb-9 text-black dark:text-white">
           {t("commitmentDeploymentModal.text")}
         </p>
-        <Spinner />
+        <Spinner className="fill-black dark:fill-white" />
       </Modal>
       <ShareKeysModal
         onReady={handleMessagesSent}

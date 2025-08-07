@@ -39,7 +39,9 @@ function ShareKeysModalContent({
   if (keyNumber === 0)
     return (
       <div className="flex flex-col">
-        <p className="text-2xl mb-5">{t("shareKeysModal.congrats.p_1")}</p>
+        <p className="text-2xl mb-5 text-black dark:text-white">
+          {t("shareKeysModal.congrats.p_1")}
+        </p>
         <p className="text-9xl text-center mb-9">
           {t("shareKeysModal.congrats.p_2")}
         </p>
@@ -58,13 +60,13 @@ function ShareKeysModalContent({
 
   return (
     <div className="flex flex-col items-center">
-      <p className="text-2xl mb-5 text-center">
+      <p className="text-2xl mb-5 text-black dark:text-white text-center">
         {t("shareKeysModal.step_info", {
           keyNumber,
           keyCount: messageIds.length,
         })}
       </p>
-      <Spinner />
+      <Spinner className="fill-black dark:fill-white" />
     </div>
   );
 }
