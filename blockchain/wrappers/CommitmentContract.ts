@@ -92,4 +92,20 @@ export class CommitmentContract implements Contract {
         .endCell(),
     });
   }
+
+  async sendStakerWithdrawal(provider: ContractProvider, via: Sender) {
+    return await provider.internal(via, {
+      value: toNano("0.05"),
+      sendMode: SendMode.PAY_GAS_SEPARATELY,
+      body: beginCell().storeUint(0x2, 32).endCell(),
+    });
+  }
+
+  async sendStakerFail(provider: ContractProvider, via: Sender) {
+    return await provider.internal(via, {
+      value: toNano("0.05"),
+      sendMode: SendMode.PAY_GAS_SEPARATELY,
+      body: beginCell().storeUint(0x3, 32).endCell(),
+    });
+  }
 }

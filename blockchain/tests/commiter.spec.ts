@@ -577,14 +577,9 @@ describe("commiter.fc contract tests", () => {
       )
     );
 
-    const sentMessageResult = await stakerWallet.send({
-      value: toNano("0.05"),
-      to: commitmentContract.address,
-      body: beginCell()
-        //todo to module with op codes
-        .storeUint(0x2, 32)
-        .endCell(),
-    });
+    const sentMessageResult = await commitmentContract.sendStakerWithdrawal(
+      stakerWallet.getSender()
+    );
 
     expect(sentMessageResult.transactions).toHaveTransaction({
       from: commitmentContract.address,

@@ -36,3 +36,34 @@
 .avatar-ring {
   @apply rounded-full object-cover border-4 border-blue-400 dark:border-blue-500 shadow-lg ring-2 ring-white/50 dark:ring-gray-800/50;
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  @apply relative overflow-hidden bg-gray-200 dark:bg-gray-700 rounded;
+}
+
+.skeleton-circle {
+  @apply relative overflow-hidden bg-gray-200 dark:bg-gray-700 rounded-full;
+}
+
+.skeleton::after {
+  content: "";
+  @apply absolute top-0 left-0 h-full w-full;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}

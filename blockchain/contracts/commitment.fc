@@ -166,7 +166,7 @@ int balance() method_id {
 
         save_data(status::succeeded(), awarded_key_list);
 
-        send_raw_message(msg.end_cell(), 64);
+        send_raw_message(msg.end_cell(), 128);
     }  elseif (op == op::staker_fail()) {
         ;;todo add exit codes table
         throw_unless(73, equal_slice_bits(sender_address, staker_address));

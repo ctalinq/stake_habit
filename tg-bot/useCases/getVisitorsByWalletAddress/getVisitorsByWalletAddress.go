@@ -1,7 +1,6 @@
 package getVisitorsByWalletAddress
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -40,18 +39,27 @@ func (s *GetVisitorsByWalletAddressUseCase) GetVisitorsByWalletAddress(c *gin.Co
 	address := c.Param("address")
 	var visitors []VisitorDTO
 
-	fmt.Println(address)
-
-	err := s.DB.Select(&visitors, "SELECT * FROM visitors LEFT JOIN commitments ON visitors.commitment_address = commitments.commitment_address WHERE commitments.wallet_address = $1", address)
+	//todo BUG: commitment will be null if there are no visitors!
+	query := `
+		SELECT
+			visitors.tg_user_id,
+			visitors.tg_user_full_name,
+			visitors.tg_user_photo_link,
+			visitors.commitment_address FROM visitors
+		LEFT JOIN
+			commitments ON visitors.commitment_address = commitments.commitment_address
+		WHERE
+			commitments.wallet_address = $1
+	`
+	err := s.DB.Select(&visitors, query, address)
 	if err != nil {
 		log.Println("Db: ", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
 		return
 	}
 
-	fmt.Println(visitors)
-
 	commitmentsMap := make(map[string]CommitmentDTO)
+
 	for _, visitor := range visitors {
 		commitment, exists := commitmentsMap[visitor.CommitmentAddress]
 

@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import InProcess from "./icons/inProcess.svg?react";
 import Succeded from "./icons/succeeded.svg?react";
@@ -7,6 +6,7 @@ import Loading from "./icons/loading.svg?react";
 import Treasure from "./icons/treasure.svg?react";
 import { useTonWallet } from "@tonconnect/ui-react";
 import { TonConnectButton } from "~/containers";
+import { useCommitmentStatus } from "./useCommitmentStatus";
 
 const CommitmentStatus = ({
   status,
@@ -26,21 +26,14 @@ const CommitmentStatus = ({
   const { t } = useTranslation("commitments");
   const wallet = useTonWallet();
 
-  const isCommitmentInProcess = useMemo(() => {
-    return status === 0 && dueDate * 1000 > Date.now();
-  }, [status, dueDate]);
-
-  const isCommitmentSucceded = useMemo(() => {
-    return status === 1;
-  }, [status]);
-
-  const isCommitmentFailed = useMemo(() => {
-    return status === 2 || (status === 0 && dueDate * 1000 < Date.now());
-  }, [status]);
+  const commitmentStatus = useCommitmentStatus({
+    status,
+    dueDate,
+  });
 
   return (
     <div>
-      {isCommitmentInProcess && (
+      {commitmentStatus === "inProcess" && (
         <>
           <InProcess width={50} height={50} className="fill-indigo-700 mb-4" />
           <p className="text-indigo-700 text-2xl fontfont-bold">
@@ -48,7 +41,7 @@ const CommitmentStatus = ({
           </p>
         </>
       )}
-      {isCommitmentSucceded && (
+      {commitmentStatus === "success" && (
         <>
           <Succeded width={70} height={70} className="fill-emerald-700 mb-4" />
           <p className="text-emerald-700 text-2xl fontfont-bold">
@@ -56,13 +49,13 @@ const CommitmentStatus = ({
           </p>
         </>
       )}
-      {!wallet && isCommitmentFailed && (
+      {!wallet && commitmentStatus === "failed" && (
         <div className="flex flex-col items-center justify-center">
           <p className="text-red-500 text-2xl">{t("connectWallet")}</p>
           <TonConnectButton onConnectStart={() => {}} />
         </div>
       )}
-      {isCommitmentFailed && wallet && (
+      {commitmentStatus === "failed" && wallet && (
         <>
           <Failed width={50} height={50} className="fill-amber-500  mb-4" />
           <p className="text-amber-500 text-2xl fontfont-bold mb-5">
