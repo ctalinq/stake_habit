@@ -5,8 +5,10 @@ import (
 	"tg-bot/infra/db"
 	telegramAuthMiddeware "tg-bot/telegramAuthMiddleware"
 	"tg-bot/useCases/getCommitmentByAddress"
-	"tg-bot/useCases/getCommitmentsByWalletId"
+	"tg-bot/useCases/getCommitmentsByWalletAddress"
+	"tg-bot/useCases/getVisitorsByWalletAddress"
 	"tg-bot/useCases/saveCommitment"
+	"tg-bot/useCases/visitCommitment"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -28,12 +30,16 @@ func main() {
 	r.Use(telegramAuthMiddeware.AuthMiddleware())
 
 	saveCommitment := saveCommitment.NewSaveCommitmentUserCase(db, b)
-	getCommitments := getCommitmentsByWalletId.NewGetCommitmentsUserCase(db)
+	getCommitments := getCommitmentsByWalletAddress.NewGetCommitmentsUserCase(db)
 	getCommitment := getCommitmentByAddress.NewGetCommitmentUserCase(db)
+	visitCommitment := visitCommitment.NewVisitCommitmentUserCase(db)
+	getVisitors := getVisitorsByWalletAddress.NewGetVisitorsByWalletAddressUseCase(db)
 
-	r.POST("/wallets/:walletId/commitments", saveCommitment.SaveCommitment)
-	r.GET("/wallets/:walletId/commitments", getCommitments.GetCommitmentsByWalletId)
+	r.POST("/wallets/:address/commitments", saveCommitment.SaveCommitment)
+	r.GET("/wallets/:address/commitments", getCommitments.GetCommitmentsByWalletAddress)
+	r.GET("/wallets/:address/visitors", getVisitors.GetVisitorsByWalletAddress)
 	r.GET("/commitments/:address", getCommitment.GetCommitmentByAddress)
+	r.POST("/commitments/:address/visits", visitCommitment.VisitCommitment)
 
 	r.Run(":5174")
 }

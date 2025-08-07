@@ -57,7 +57,7 @@ const NavbarLayout = () => {
           alt="User Avatar"
           className="w-12 h-12 avatar-ring"
         />
-        <TonConnectButton />
+        <TonConnectButton onConnectStart={() => {}} />
         <ThemeToggle />
       </div>
       <Outlet />

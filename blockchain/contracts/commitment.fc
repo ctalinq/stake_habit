@@ -51,7 +51,7 @@ int status::failed() asm "2 PUSHINT";
 }
 
 
-(slice, cell, cell, int) get_info() method_id {
+(int, slice, cell, cell, int, cell) get_info() method_id {
     (
         int status,
         slice staker_address,
@@ -64,10 +64,12 @@ int status::failed() asm "2 PUSHINT";
     ) = load_data();
 
     return (
+        status,
         staker_address,
         title,
         description,
-        due_date
+        due_date,
+        awarded_key_list
     );
 }
 
@@ -164,7 +166,7 @@ int balance() method_id {
 
         save_data(status::succeeded(), awarded_key_list);
 
-        send_raw_message(msg.end_cell(), 64);
+        send_raw_message(msg.end_cell(), 128);
     }  elseif (op == op::staker_fail()) {
         ;;todo add exit codes table
         throw_unless(73, equal_slice_bits(sender_address, staker_address));
@@ -176,4 +178,3 @@ int balance() method_id {
         save_data(status::failed(), awarded_key_list);
     }
 }
-

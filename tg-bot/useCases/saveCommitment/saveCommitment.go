@@ -30,7 +30,7 @@ func NewSaveCommitmentUserCase(db *sqlx.DB, bot *gotgbot.Bot) *SaveCommitmentUse
 }
 
 func (s *SaveCommitmentUserCase) SaveCommitment(c *gin.Context) {
-	walletId := c.Param("walletId")
+	walletAddress := c.Param("address")
 	var commitment CommitmentDTO
 
 	if err := c.ShouldBind(&commitment); err != nil {
@@ -79,7 +79,7 @@ func (s *SaveCommitmentUserCase) SaveCommitment(c *gin.Context) {
 		messageIds = append(messageIds, preparedMessage.Id)
 	}
 
-	_, dbErr := s.DB.Exec("INSERT INTO commitments (wallet_id, tg_user_photo_link, commitment_address) VALUES ($1, $2, $3)", walletId, initData.User.PhotoURL, commitment.CommitmentAddress)
+	_, dbErr := s.DB.Exec("INSERT INTO commitments (wallet_address, tg_user_photo_link, commitment_address) VALUES ($1, $2, $3)", walletAddress, initData.User.PhotoURL, commitment.CommitmentAddress)
 	if dbErr != nil {
 		log.Println("Db: ", dbErr)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})

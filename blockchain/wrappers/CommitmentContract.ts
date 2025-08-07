@@ -5,9 +5,13 @@ import {
   Contract,
   contractAddress,
   ContractProvider,
+  Sender,
+  SendMode,
+  toNano,
 } from "@ton/core";
+import { parseRecipientKeyList } from "./utils";
 
-export type CommiterContractConfig = {
+export type CommitmentContractConfig = {
   stakerAddress: Address;
   recipientsList: Cell;
   recipientsCount: number;
@@ -17,7 +21,7 @@ export type CommiterContractConfig = {
 };
 
 export function commitmentContractConfigToCell(
-  config: CommiterContractConfig
+  config: CommitmentContractConfig
 ): Cell {
   return beginCell()
     .storeUint(0, 2)
@@ -38,7 +42,7 @@ export class CommitmentContract implements Contract {
   ) {}
 
   static async createFromConfig(
-    config: CommiterContractConfig,
+    config: CommitmentContractConfig,
     code: Cell,
     workchain = 0
   ) {
@@ -52,15 +56,56 @@ export class CommitmentContract implements Contract {
   async getInfo(provider: ContractProvider) {
     const { stack } = await provider.get("get_info", []);
     return {
+      status: stack.readNumber(),
       stakerAddress: stack.readAddress(),
       title: stack.readString(),
       description: stack.readString(),
       dueDate: stack.readNumber(),
+      awardedKeyList: parseRecipientKeyList(stack.readCell()),
     };
   }
 
   async getBalance(provider: ContractProvider) {
     const { stack } = await provider.get("balance", []);
     return stack.readBigNumber();
+  }
+
+  async sendDeploy(provider: ContractProvider, via: Sender, value: bigint) {
+    await provider.internal(via, {
+      value,
+      sendMode: SendMode.PAY_GAS_SEPARATELY,
+      body: beginCell().endCell(),
+    });
+  }
+
+  async sendRecipientWithdrawal(
+    provider: ContractProvider,
+    via: Sender,
+    key: string
+  ) {
+    return await provider.internal(via, {
+      value: toNano("0.05"),
+      sendMode: SendMode.PAY_GAS_SEPARATELY,
+      body: beginCell()
+        .storeUint(0x1, 32)
+        .storeRef(beginCell().storeStringTail(key).endCell())
+        .endCell(),
+    });
+  }
+
+  async sendStakerWithdrawal(provider: ContractProvider, via: Sender) {
+    return await provider.internal(via, {
+      value: toNano("0.05"),
+      sendMode: SendMode.PAY_GAS_SEPARATELY,
+      body: beginCell().storeUint(0x2, 32).endCell(),
+    });
+  }
+
+  async sendStakerFail(provider: ContractProvider, via: Sender) {
+    return await provider.internal(via, {
+      value: toNano("0.05"),
+      sendMode: SendMode.PAY_GAS_SEPARATELY,
+      body: beginCell().storeUint(0x3, 32).endCell(),
+    });
   }
 }

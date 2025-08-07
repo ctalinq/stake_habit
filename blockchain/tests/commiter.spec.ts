@@ -357,15 +357,10 @@ describe("commiter.fc contract tests", () => {
     );
 
     const recipientWallet = await blockchain.treasury("recipientAddress");
-    const sentMessageResult = await recipientWallet.send({
-      value: toNano("0.05"),
-      to: commitmentContract.address,
-      body: beginCell()
-        //todo to module with op codes
-        .storeUint(0x1, 32)
-        .storeRef(beginCell().storeStringTail(recipientsKeys[0]).endCell())
-        .endCell(),
-    });
+    const sentMessageResult = await commitmentContract.sendRecipientWithdrawal(
+      recipientWallet.getSender(),
+      recipientsKeys[0]
+    );
 
     expect(sentMessageResult.transactions).toHaveTransaction({
       from: commitmentContract.address,
@@ -582,14 +577,9 @@ describe("commiter.fc contract tests", () => {
       )
     );
 
-    const sentMessageResult = await stakerWallet.send({
-      value: toNano("0.05"),
-      to: commitmentContract.address,
-      body: beginCell()
-        //todo to module with op codes
-        .storeUint(0x2, 32)
-        .endCell(),
-    });
+    const sentMessageResult = await commitmentContract.sendStakerWithdrawal(
+      stakerWallet.getSender()
+    );
 
     expect(sentMessageResult.transactions).toHaveTransaction({
       from: commitmentContract.address,

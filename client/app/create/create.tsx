@@ -56,21 +56,25 @@ export default function Create() {
       recepientKeys: string[];
       address: string;
     }) => {
-      const response = await fetch(
-        `/api/wallets/${sender?.address?.toString()}/commitments`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `tma ${initData}`,
-          },
-          body: JSON.stringify({
-            commitment_address: address,
-            recipient_keys: recepientKeys,
-          }),
-        }
-      );
-      return response.json();
+      if (wallet?.account) {
+        const response = await fetch(
+          `/api/wallets/${btoa(wallet.account.address)}/commitments`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `tma ${initData}`,
+            },
+            body: JSON.stringify({
+              commitment_address: address,
+              recipient_keys: recepientKeys,
+            }),
+          }
+        );
+        return response.json();
+      }
+
+      return null;
     },
   });
 

@@ -1,4 +1,10 @@
 {
   "loading": "Loading commitment...",
-  "due": "Due {{date}}"
+  "due": "Due: {{date}}",
+  "inProcess": "Commitment in Process",
+  "succeeded": "Commitment Succeeded",
+  "failed": "Commitment Failed",
+  "getRewards": "Get Rewards",
+  "alreadyRewarded": "Already Rewarded",
+  "connectWallet": "To get reward you need to connect your wallet"
 }

@@ -9,7 +9,7 @@ import (
 )
 
 type CommitmentDTO struct {
-	WalletId          string `db:"wallet_id" json:"wallet_id" binding:"required"`
+	WalletAddress     string `db:"wallet_address" json:"wallet_address" binding:"required"`
 	UserPhotoURL      string `db:"tg_user_photo_link" json:"tg_user_photo_link"`
 	CommitmentAddress string `db:"commitment_address" json:"commitment_address" binding:"required"`
 }
