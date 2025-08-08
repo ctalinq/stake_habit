@@ -1,5 +1,5 @@
-import React, { useRef, useState } from "react";
-import { Button, Modal } from "~/components";
+import { useEffect, useRef, useState } from "react";
+import { Modal } from "~/components";
 import { shareMessage } from "@telegram-apps/sdk-react";
 import { useTranslation } from "react-i18next";
 import Spinner from "~/components/icons/spinner.svg?react";
@@ -7,20 +7,29 @@ import Spinner from "~/components/icons/spinner.svg?react";
 interface ShareKeysModalProps {
   messageIds?: string[];
   onReady: () => void;
+  onError: (error: Error) => void;
 }
 
 interface ShareKeysModalContentProps {
   messageIds: string[];
   onReady: () => void;
+  onError: (error: Error) => void;
 }
 
 function ShareKeysModalContent({
   messageIds,
   onReady,
+  onError,
 }: ShareKeysModalContentProps) {
   const { t } = useTranslation("create");
   const [keyNumber, setKeyNumber] = useState(0);
   const keyNumberRef = useRef(0);
+
+  useEffect(() => {
+    if (keyNumberRef.current === 0) {
+      stepOn();
+    }
+  }, [keyNumberRef.current]);
 
   const stepOn = async () => {
     setKeyNumber(keyNumberRef.current + 1);
@@ -28,35 +37,14 @@ function ShareKeysModalContent({
 
     try {
       await shareMessage(messageIds[keyNumberRef.current - 1]);
-    } catch (error) {
-      console.error(error);
-    } finally {
+
       if (keyNumberRef.current >= messageIds.length) onReady();
       else setTimeout(stepOn, 3000);
+    } catch (error) {
+      console.error(error);
+      onError(error as Error);
     }
   };
-
-  if (keyNumber === 0)
-    return (
-      <div className="flex flex-col">
-        <p className="text-2xl mb-5 text-black dark:text-white">
-          {t("shareKeysModal.congrats.p_1")}
-        </p>
-        <p className="text-9xl text-center mb-9">
-          {t("shareKeysModal.congrats.p_2")}
-        </p>
-        <p className="text-amber-600 font-bold mb-4">
-          {t("shareKeysModal.congrats.p_3")}
-        </p>
-        <Button
-          onClick={() => {
-            stepOn();
-          }}
-        >
-          {t("shareKeysModal.congrats.button")}
-        </Button>
-      </div>
-    );
 
   return (
     <div className="flex flex-col items-center">
@@ -74,6 +62,7 @@ function ShareKeysModalContent({
 export default function ShareKeysModal({
   messageIds,
   onReady,
+  onError,
 }: ShareKeysModalProps) {
   return (
     <Modal
@@ -83,7 +72,11 @@ export default function ShareKeysModal({
       onClose={() => {}}
     >
       {messageIds && (
-        <ShareKeysModalContent onReady={onReady} messageIds={messageIds} />
+        <ShareKeysModalContent
+          onError={onError}
+          onReady={onReady}
+          messageIds={messageIds}
+        />
       )}
     </Modal>
   );

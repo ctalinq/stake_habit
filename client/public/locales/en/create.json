@@ -48,13 +48,12 @@
     "description": "To create commitment you need to connect your wallet"
   },
   "shareKeysModal": {
-    "congrats": {
-      "p_1": "Congratulations! Now you are ready to share your keys!",
-      "p_2": "🎉",
-      "p_3": "Warn: it's recommended to select only one recipient per key",
-      "button": "Start Sharing"
-    },
     "step_info": "Please, Share key number {{keyNumber}} ({{keyNumber}}/{{keyCount}})"
+  },
+  "success": {
+    "congrats": "Congratulations! Your commitment has been created successfully!",
+    "emoji": "🎉",
+    "ok": "Ok"
   },
   "commitmentDeploymentModal": {
     "text": "Waiting for commitment deployment..."

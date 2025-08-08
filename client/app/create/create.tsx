@@ -51,7 +51,11 @@ export default function Create() {
     title: string;
   } | null>(null);
 
-  const { data: messageIds, mutateAsync: saveCommitment } = useMutation({
+  const {
+    data: messageIds,
+    mutateAsync: saveCommitment,
+    reset: resetSaveCommitment,
+  } = useMutation({
     mutationFn: async ({
       recepientKeys,
       address,
@@ -86,7 +90,6 @@ export default function Create() {
       try {
         const info = await commitmentContract.getInfo();
         setCommitmentInfo(info);
-        navigate("/");
       } catch (error) {
         console.error(error);
         setTimeout(checkCommitmenIdDeployed, 4000);
@@ -169,6 +172,12 @@ export default function Create() {
       setCreatedCommitmentAddress(commitmentContract.address);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      resetSaveCommitment();
+    };
+  }, []);
 
   const isDeployModalOpen = !commitmentInfo && !!createdCommitmentAddress;
 
@@ -335,8 +344,33 @@ export default function Create() {
         </p>
         <Spinner className="fill-black dark:fill-white" />
       </Modal>
+
+      <Modal
+        showCloseButton={false}
+        modalClassName="w-90 space-y-4 flex flex-col items-center"
+        isOpen={!!commitmentInfo}
+        onClose={() => {}}
+      >
+        <div className="flex flex-col">
+          <p className="text-2xl mb-5 text-center text-black dark:text-white">
+            {t("success.congrats")}
+          </p>
+          <p className="text-9xl text-center mb-9">{t("success.emoji")}</p>
+          <Button
+            onClick={() => {
+              navigate("/");
+            }}
+          >
+            {t("success.ok")}
+          </Button>
+        </div>
+      </Modal>
       <ShareKeysModal
         onReady={handleMessagesSent}
+        onError={() => {
+          setMessagesWereSent(false);
+          resetSaveCommitment();
+        }}
         messageIds={messagesWereSent ? undefined : messageIds}
       />
     </Card>
