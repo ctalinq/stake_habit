@@ -3,6 +3,7 @@ package getVisitorsByWalletAddress
 import (
 	"log"
 	"net/http"
+	telegramAuthMiddeware "tg-bot/telegramAuthMiddleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
@@ -39,7 +40,12 @@ func (s *GetVisitorsByWalletAddressUseCase) GetVisitorsByWalletAddress(c *gin.Co
 	address := c.Param("address")
 	var visitors []VisitorDTO
 
-	//todo BUG: commitment will be null if there are no visitors!
+	initData, ok := telegramAuthMiddeware.CtxInitData(c.Request.Context())
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid init-data"})
+		return
+	}
+
 	query := `
 		SELECT
   			COALESCE(visitors.tg_user_id, 0) AS tg_user_id,
@@ -51,9 +57,11 @@ func (s *GetVisitorsByWalletAddressUseCase) GetVisitorsByWalletAddress(c *gin.Co
 		LEFT JOIN
 			visitors ON visitors.commitment_address = commitments.commitment_address
 		WHERE
-			commitments.wallet_address = $1
+			commitments.wallet_address = $1 AND
+			commitments.tg_user_id = $2 AND
+			commitments.is_active = TRUE
 	`
-	err := s.DB.Select(&visitors, query, address)
+	err := s.DB.Select(&visitors, query, address, initData.User.ID)
 	if err != nil {
 		log.Println("Db: ", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})

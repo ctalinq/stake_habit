@@ -39,7 +39,7 @@ function Commitment({
   //maybe - congrats popup and invintation to home page
 
   const { data: commitmentData } = useQuery({
-    queryKey: ["commitment"],
+    queryKey: ["commitment", commitmentContract?.address?.toString()],
     queryFn: () => {
       return commitmentContract.getInfo();
     },
@@ -61,8 +61,8 @@ function Commitment({
 
   const { data: userData } = useQuery({
     queryKey: ["commitment_user_data"],
-    queryFn: () => {
-      return fetch(
+    queryFn: async () => {
+      const response = await fetch(
         `/api/commitments/${commitmentContract?.address?.toString()}`,
         {
           method: "GET",
@@ -70,7 +70,9 @@ function Commitment({
             Authorization: `tma ${initData}`,
           },
         }
-      ).then((response) => response.json());
+      );
+
+      return await response.json();
     },
   });
 

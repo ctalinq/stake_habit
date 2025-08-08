@@ -15,8 +15,6 @@ export const useCommitmentContract = (address: Address | null) => {
       setCommitmentContract(
         tonClient.open(contract) as OpenedContract<CommitmentContract>
       );
-    } else {
-      setCommitmentContract(null);
     }
   }, [tonClient, address]);
 
