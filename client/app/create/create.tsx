@@ -85,10 +85,28 @@ export default function Create() {
     },
   });
 
+  const { mutateAsync: setCommitmentIsActive } = useMutation({
+    mutationFn: async () => {
+      if (commitmentContract?.address) {
+        await fetch(
+          `/api/commitments/${commitmentContract?.address.toString()}/success`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `tma ${initData}`,
+            },
+          }
+        );
+      }
+    },
+  });
+
   const checkCommitmenIdDeployed = async () => {
     if (commitmentContract && createdCommitmentAddress) {
       try {
         const info = await commitmentContract.getInfo();
+        await setCommitmentIsActive();
         setCommitmentInfo(info);
       } catch (error) {
         console.error(error);
