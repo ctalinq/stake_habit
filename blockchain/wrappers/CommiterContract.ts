@@ -22,6 +22,7 @@ export type CommiterContractConfig = {
 
 enum OP {
   COMMIT = 1,
+  WITHDRAWAL = 2,
 }
 
 export function commiterContractConfigToCell(
@@ -93,6 +94,14 @@ export class CommiterContract implements Contract {
       value,
       sendMode: SendMode.PAY_GAS_SEPARATELY,
       body: beginCell().endCell(),
+    });
+  }
+
+  async sendWithdrawal(provider: ContractProvider, via: Sender) {
+    await provider.internal(via, {
+      value: toNano("0.05"),
+      sendMode: SendMode.PAY_GAS_SEPARATELY,
+      body: beginCell().storeUint(OP.WITHDRAWAL, 32).endCell(),
     });
   }
 }

@@ -1,6 +1,8 @@
 CREATE TABLE commitments (
     commitment_address VARCHAR(255) UNIQUE NOT NULL,
     wallet_address VARCHAR(255) NOT NULL,
+    tg_user_id BIGINT NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT FALSE,
     tg_user_photo_link TEXT
 );
 

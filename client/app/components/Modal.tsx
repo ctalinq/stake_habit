@@ -32,7 +32,7 @@ export default function Modal({
       <div
         onClick={(e) => e.stopPropagation()}
         className={`
-        bg-white rounded-xl shadow p-6 relative ${modalClassName}
+        bg-white dark:bg-gray-800 rounded-xl shadow p-6 relative ${modalClassName}
         `}
       >
         {showCloseButton && (

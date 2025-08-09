@@ -2,6 +2,7 @@
 #include "imports/utils.fc";
 
 int op::commit() asm "1 PUSHINT";
+int op::withdrawal() asm "2 PUSHINT";
 int workchain() asm "0 PUSHINT";
 
 const TRANSACTION_DATE_OFFSET_S = 60;
@@ -202,6 +203,16 @@ slice calculate_commitment_address(cell state_init) inline {
         return ();
     }
 
+    if (op == op::withdrawal()) {
+        throw_unless(73, equal_slice_bits(staker_address, owner_address));
+
+        var msg = begin_cell()
+            .store_uint(0x18, 6)
+            .store_slice(staker_address)
+            .store_coins(0)
+            .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1);
+
+        send_raw_message(msg.end_cell(), 128);
+    }
     ;;todo create code errors table
-    ;;throw_unless(73, equal_slice_bits(sender_address, owner_address));
 }

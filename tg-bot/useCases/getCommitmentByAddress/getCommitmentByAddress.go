@@ -12,6 +12,8 @@ type CommitmentDTO struct {
 	WalletAddress     string `db:"wallet_address" json:"wallet_address" binding:"required"`
 	UserPhotoURL      string `db:"tg_user_photo_link" json:"tg_user_photo_link"`
 	CommitmentAddress string `db:"commitment_address" json:"commitment_address" binding:"required"`
+	UserId            string `db:"tg_user_id" json:"tg_user_id" binding:"required"`
+	IsActive          bool   `db:"is_active" json:"is_active" binding:"required"`
 }
 
 type GetCommitmentUseCase struct {

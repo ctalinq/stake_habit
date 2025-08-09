@@ -8,6 +8,7 @@ import (
 	"tg-bot/useCases/getCommitmentsByWalletAddress"
 	"tg-bot/useCases/getVisitorsByWalletAddress"
 	"tg-bot/useCases/saveCommitment"
+	"tg-bot/useCases/setCommitmentIsActive"
 	"tg-bot/useCases/visitCommitment"
 
 	"github.com/gin-gonic/gin"
@@ -30,6 +31,7 @@ func main() {
 	r.Use(telegramAuthMiddeware.AuthMiddleware())
 
 	saveCommitment := saveCommitment.NewSaveCommitmentUserCase(db, b)
+	setCommitmentIsActive := setCommitmentIsActive.NewSetCommitmentIsActiveUserCase(db)
 	getCommitments := getCommitmentsByWalletAddress.NewGetCommitmentsUserCase(db)
 	getCommitment := getCommitmentByAddress.NewGetCommitmentUserCase(db)
 	visitCommitment := visitCommitment.NewVisitCommitmentUserCase(db)
@@ -40,6 +42,7 @@ func main() {
 	r.GET("/wallets/:address/visitors", getVisitors.GetVisitorsByWalletAddress)
 	r.GET("/commitments/:address", getCommitment.GetCommitmentByAddress)
 	r.POST("/commitments/:address/visits", visitCommitment.VisitCommitment)
+	r.POST("/commitments/:address/success", setCommitmentIsActive.SetCommitmentIsActive)
 
 	r.Run(":5174")
 }

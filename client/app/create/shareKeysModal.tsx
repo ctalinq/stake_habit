@@ -1,68 +1,69 @@
-import React, { useRef, useState } from "react";
-import { Button, Modal } from "~/components";
+import { useEffect, useRef, useState } from "react";
+import { Modal } from "~/components";
 import { shareMessage } from "@telegram-apps/sdk-react";
 import { useTranslation } from "react-i18next";
 import Spinner from "~/components/icons/spinner.svg?react";
 
 interface ShareKeysModalProps {
   messageIds?: string[];
+  onReady: () => void;
+  onError: (error: Error) => void;
 }
 
 interface ShareKeysModalContentProps {
   messageIds: string[];
+  onReady: () => void;
+  onError: (error: Error) => void;
 }
 
-function ShareKeysModalContent({ messageIds }: ShareKeysModalContentProps) {
+function ShareKeysModalContent({
+  messageIds,
+  onReady,
+  onError,
+}: ShareKeysModalContentProps) {
   const { t } = useTranslation("create");
   const [keyNumber, setKeyNumber] = useState(0);
-  //todo - redirect to main page
-  const [, setIsFinished] = useState(false);
   const keyNumberRef = useRef(0);
+
+  useEffect(() => {
+    if (keyNumberRef.current === 0) {
+      stepOn();
+    }
+  }, [keyNumberRef.current]);
 
   const stepOn = async () => {
     setKeyNumber(keyNumberRef.current + 1);
     keyNumberRef.current = keyNumberRef.current + 1;
 
-    if (keyNumberRef.current > messageIds.length) return setIsFinished(true);
+    try {
+      await shareMessage(messageIds[keyNumberRef.current - 1]);
 
-    await shareMessage(messageIds[keyNumberRef.current - 1]);
-    setTimeout(stepOn, 3000);
+      if (keyNumberRef.current >= messageIds.length) onReady();
+      else setTimeout(stepOn, 3000);
+    } catch (error) {
+      console.error(error);
+      onError(error as Error);
+    }
   };
-
-  if (keyNumber === 0)
-    return (
-      <div className="flex flex-col">
-        <p className="text-2xl mb-5">{t("shareKeysModal.congrats.p_1")}</p>
-        <p className="text-9xl text-center mb-9">
-          {t("shareKeysModal.congrats.p_2")}
-        </p>
-        <p className="text-amber-600 font-bold mb-4">
-          {t("shareKeysModal.congrats.p_3")}
-        </p>
-        <Button
-          onClick={() => {
-            stepOn();
-          }}
-        >
-          {t("shareKeysModal.congrats.button")}
-        </Button>
-      </div>
-    );
 
   return (
     <div className="flex flex-col items-center">
-      <p className="text-2xl mb-5 text-center">
+      <p className="text-2xl mb-5 text-black dark:text-white text-center">
         {t("shareKeysModal.step_info", {
           keyNumber,
           keyCount: messageIds.length,
         })}
       </p>
-      <Spinner />
+      <Spinner className="fill-black dark:fill-white" />
     </div>
   );
 }
 
-export default function ShareKeysModal({ messageIds }: ShareKeysModalProps) {
+export default function ShareKeysModal({
+  messageIds,
+  onReady,
+  onError,
+}: ShareKeysModalProps) {
   return (
     <Modal
       showCloseButton={false}
@@ -70,7 +71,13 @@ export default function ShareKeysModal({ messageIds }: ShareKeysModalProps) {
       isOpen={messageIds ? messageIds.length > 0 : false}
       onClose={() => {}}
     >
-      {messageIds && <ShareKeysModalContent messageIds={messageIds} />}
+      {messageIds && (
+        <ShareKeysModalContent
+          onError={onError}
+          onReady={onReady}
+          messageIds={messageIds}
+        />
+      )}
     </Modal>
   );
 }

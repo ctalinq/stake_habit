@@ -47,7 +47,9 @@ const CommitmentInfo = ({
         )}
       </div>
       <div>
-        <p className="truncate text text-lg">{title}</p>
+        <p className="truncate text text-lg text-black dark:text-white">
+          {title}
+        </p>
         {commitmentStatus === "inProcess" && !isPolling && (
           <div className="flex gap-4 text-sm">
             <button onClick={onSuccess} className="text-emerald-700 underline">
@@ -157,7 +159,9 @@ function CommitmentRow({
       )}
       {commitment.users.length > 0 && (
         <div className="absolute right-0 top-14 flex items-center">
-          <p className="text-sm text-gray-500 mr-4">{t("viewers")}</p>
+          <p className="text-sm text-gray-500 dark:text-white mr-4">
+            {t("viewers")}
+          </p>
           {commitment.users.map((user) => (
             <>
               <div key={user.full_name} style={{ marginLeft: "-10px" }}>

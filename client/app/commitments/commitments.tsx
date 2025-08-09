@@ -16,8 +16,8 @@ function LoadingPlaceholder() {
 
   return (
     <div className="pt-10 flex flex-col items-center">
-      <p className="text-3xl mb-8">{t("loading")}</p>
-      <Spinner width={80} height={80} />
+      <p className="text-3xl mb-8 text-black dark:text-white">{t("loading")}</p>
+      <Spinner className="fill-black dark:fill-white" width={80} height={80} />
     </div>
   );
 }
@@ -39,7 +39,7 @@ function Commitment({
   //maybe - congrats popup and invintation to home page
 
   const { data: commitmentData } = useQuery({
-    queryKey: ["commitment"],
+    queryKey: ["commitment", commitmentContract?.address?.toString()],
     queryFn: () => {
       return commitmentContract.getInfo();
     },
@@ -61,8 +61,8 @@ function Commitment({
 
   const { data: userData } = useQuery({
     queryKey: ["commitment_user_data"],
-    queryFn: () => {
-      return fetch(
+    queryFn: async () => {
+      const response = await fetch(
         `/api/commitments/${commitmentContract?.address?.toString()}`,
         {
           method: "GET",
@@ -70,7 +70,9 @@ function Commitment({
             Authorization: `tma ${initData}`,
           },
         }
-      ).then((response) => response.json());
+      );
+
+      return await response.json();
     },
   });
 
@@ -105,12 +107,17 @@ function Commitment({
               alt="User Avatar"
               className="w-12 h-12 avatar-ring mr-3 mb-6"
             />
-            <TruncatedText maxLength={15} className="text-4xl mb-2">
+            <TruncatedText
+              maxLength={15}
+              className="text-4xl mb-2 text-black dark:text-white"
+            >
               {commitmentData.title}
             </TruncatedText>
           </div>
-          <p className="mb-4">{commitmentData.description}</p>
-          <p className="mb-5">
+          <p className="mb-4 text-black dark:text-white">
+            {commitmentData.description}
+          </p>
+          <p className="mb-5 text-black dark:text-white">
             {t("due", { date: formatDate(commitmentData.dueDate) })}
           </p>
           <CommitmentStatus

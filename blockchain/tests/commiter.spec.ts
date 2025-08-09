@@ -643,4 +643,57 @@ describe("commiter.fc contract tests", () => {
       exitCode: 78,
     });
   });
+
+  it(`should pay commiter owner withdrawal`, async () => {
+    const commitmentDescription = validDescription;
+    const commitmentTitle = validTitle;
+    const stake = toNano("50");
+
+    await commiterContract.sendCommitment(
+      stakerWallet.getSender(),
+      commitmentTitle,
+      commitmentDescription,
+      validDueDate,
+      recipientsKeyList,
+      recipientsKeys.length,
+      stake
+    );
+
+    const sentMessageResult = await commiterContract.sendWithdrawal(
+      ownerWallet.getSender()
+    );
+
+    expect(sentMessageResult.transactions).toHaveTransaction({
+      from: commiterContract.address,
+      to: ownerWallet.address,
+      success: true,
+    });
+  });
+
+  it(`should not pay not commiter owner withdrawal`, async () => {
+    const commitmentDescription = validDescription;
+    const commitmentTitle = validTitle;
+    const stake = toNano("50");
+
+    await commiterContract.sendCommitment(
+      stakerWallet.getSender(),
+      commitmentTitle,
+      commitmentDescription,
+      validDueDate,
+      recipientsKeyList,
+      recipientsKeys.length,
+      stake
+    );
+
+    const notOwnerWallet = await blockchain.treasury("notOwnerWallet");
+    const sentMessageResult = await commiterContract.sendWithdrawal(
+      notOwnerWallet.getSender()
+    );
+
+    expect(sentMessageResult.transactions).toHaveTransaction({
+      from: notOwnerWallet.address,
+      to: commiterContract.address,
+      success: false,
+    });
+  });
 });

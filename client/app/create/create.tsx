@@ -26,6 +26,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRawInitData } from "@telegram-apps/sdk-react";
 import ShareKeysModal from "./shareKeysModal";
 import { useCommitmentContract } from "../hooks/useCommitmentContract";
+import { useNavigate } from "react-router";
 
 export default function Create() {
   const wallet = useTonWallet();
@@ -37,6 +38,8 @@ export default function Create() {
   const [stakeAmount, setStakeAmount] = useState<number | null>(null);
   const [recepientsCount, setRecepientsCount] = useState<number | null>(null);
   const [recepientKeys, setRecepientKeys] = useState<string[] | null>(null);
+  const [messagesWereSent, setMessagesWereSent] = useState(false);
+  const navigate = useNavigate();
 
   const { sender } = useTonSender();
   const commiterContract = useCommiterContract();
@@ -48,7 +51,11 @@ export default function Create() {
     title: string;
   } | null>(null);
 
-  const { data: messageIds, mutateAsync: saveCommitment } = useMutation({
+  const {
+    data: messageIds,
+    mutateAsync: saveCommitment,
+    reset: resetSaveCommitment,
+  } = useMutation({
     mutationFn: async ({
       recepientKeys,
       address,
@@ -78,18 +85,29 @@ export default function Create() {
     },
   });
 
+  const { mutateAsync: setCommitmentIsActive } = useMutation({
+    mutationFn: async () => {
+      if (commitmentContract?.address) {
+        await fetch(
+          `/api/commitments/${commitmentContract?.address.toString()}/success`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `tma ${initData}`,
+            },
+          }
+        );
+      }
+    },
+  });
+
   const checkCommitmenIdDeployed = async () => {
     if (commitmentContract && createdCommitmentAddress) {
       try {
         const info = await commitmentContract.getInfo();
+        await setCommitmentIsActive();
         setCommitmentInfo(info);
-
-        if (recepientKeys) {
-          await saveCommitment({
-            recepientKeys,
-            address: createdCommitmentAddress.toString(),
-          });
-        }
       } catch (error) {
         console.error(error);
         setTimeout(checkCommitmenIdDeployed, 4000);
@@ -133,6 +151,54 @@ export default function Create() {
     setIsWalletModalOpen(true);
   }, []);
 
+  const handleMessagesSent = async () => {
+    setMessagesWereSent(true);
+
+    if (!wallet) {
+      openWalletModal();
+    } else if (commiterContract && recepientKeys && stakeAmount) {
+      const dueDateSeconds = Math.floor(dueDate.getTime() / 1000);
+      const recipientsKeyList = generateRecipientsKeyList(recepientKeys);
+
+      await commiterContract.sendCommitment(
+        sender,
+        title,
+        description,
+        dueDateSeconds,
+        recipientsKeyList,
+        recepientKeys.length,
+        toNano(stakeAmount.toString())
+      );
+
+      //todo - remove duplication
+      const commitmentCodeCell = Cell.fromBoc(
+        Buffer.from(commitmentContractHex, "hex")
+      )[0];
+
+      const commitmentContract = await CommitmentContract.createFromConfig(
+        {
+          stakerAddress: Address.parse(wallet.account.address),
+          title: title,
+          description: description,
+          dueDate: dueDateSeconds,
+          recipientsList: recipientsKeyList,
+          recipientsCount: recepientKeys.length,
+        },
+        commitmentCodeCell
+      );
+
+      setCreatedCommitmentAddress(commitmentContract.address);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      resetSaveCommitment();
+    };
+  }, []);
+
+  const isDeployModalOpen = !commitmentInfo && !!createdCommitmentAddress;
+
   const handleCreateClicked = async () => {
     if (!wallet) {
       openWalletModal();
@@ -143,16 +209,6 @@ export default function Create() {
       );
       const recipientsKeys = await generateRecipientsKeys(recipientNumbers);
       const recipientsKeyList = generateRecipientsKeyList(recipientsKeys);
-
-      await commiterContract.sendCommitment(
-        sender,
-        title,
-        description,
-        dueDateSeconds,
-        recipientsKeyList,
-        recipientsKeys.length,
-        toNano(stakeAmount.toString())
-      );
 
       const commitmentCodeCell = Cell.fromBoc(
         Buffer.from(commitmentContractHex, "hex")
@@ -170,8 +226,12 @@ export default function Create() {
         commitmentCodeCell
       );
 
-      setCreatedCommitmentAddress(commitmentContract.address);
       setRecepientKeys(recipientsKeys);
+
+      await saveCommitment({
+        recepientKeys: recipientsKeys,
+        address: commitmentContract.address.toString(),
+      });
     }
   };
 
@@ -292,16 +352,45 @@ export default function Create() {
         <TonConnectButton onConnectStart={closeWalletModal} />
       </Modal>
       <Modal
+        showCloseButton={false}
         modalClassName="w-90 space-y-4 flex flex-col items-center"
-        isOpen={!commitmentInfo && !!createdCommitmentAddress}
+        isOpen={isDeployModalOpen}
         onClose={() => {}}
       >
-        <p className="text-center mb-9">
+        <p className="text-center mb-9 text-black dark:text-white">
           {t("commitmentDeploymentModal.text")}
         </p>
-        <Spinner />
+        <Spinner className="fill-black dark:fill-white" />
       </Modal>
-      <ShareKeysModal messageIds={messageIds} />
+
+      <Modal
+        showCloseButton={false}
+        modalClassName="w-90 space-y-4 flex flex-col items-center"
+        isOpen={!!commitmentInfo}
+        onClose={() => {}}
+      >
+        <div className="flex flex-col">
+          <p className="text-2xl mb-5 text-center text-black dark:text-white">
+            {t("success.congrats")}
+          </p>
+          <p className="text-9xl text-center mb-9">{t("success.emoji")}</p>
+          <Button
+            onClick={() => {
+              navigate("/");
+            }}
+          >
+            {t("success.ok")}
+          </Button>
+        </div>
+      </Modal>
+      <ShareKeysModal
+        onReady={handleMessagesSent}
+        onError={() => {
+          setMessagesWereSent(false);
+          resetSaveCommitment();
+        }}
+        messageIds={messagesWereSent ? undefined : messageIds}
+      />
     </Card>
   );
 }
