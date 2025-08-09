@@ -20,7 +20,7 @@
   },
   "scripts": {
     "compile": "npx blueprint build --all",
-    "deploy": "npx blueprint run",
+    "blueprint": "npx blueprint run",
     "build": "vite build",
     "test": "vitest run",
     "test:watch": "vitest watch"
