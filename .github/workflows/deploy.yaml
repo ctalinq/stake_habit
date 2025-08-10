@@ -2,6 +2,13 @@ name: Deployment
 env:
   VITE_COMMITER_CONTRACT_ADDRESS: ${{ vars.VITE_COMMITER_CONTRACT_ADDRESS }}
   VITE_TON_NETWORK: ${{ vars.VITE_TON_NETWORK }}
+  COMMITMENT_LINK_PREFIX: ${{ vars.COMMITMENT_LINK_PREFIX }}
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  DB_HOST: ${{ vars.DB_HOST }}
+  DB_PORT: ${{ vars.DB_PORT }}
+  DB_USER: ${{ vars.DB_USER }}
+  DB_PASSWORD: ${{ vars.DB_PASSWORD }}
+  DB_NAME: ${{ vars.DB_NAME }}
 
 on:
   push:
@@ -9,15 +16,15 @@ on:
       - master
 
 jobs:
-  build:
+  deploy-infra:
     runs-on: self-hosted
     steps:
       - name: Clone step - clone and check out repository
         uses: actions/checkout@v4
-      - name: Build client docker image
-        run: DOCKER_BUILDKIT=0 docker compose build --no-cache --memory=2g
+      - name: Build and run docker images
+        run: DOCKER_BUILDKIT=0 docker compose up --build --force-recreate --memory=2g
 
-  deploy:
+  deploy-client:
     runs-on: self-hosted
     needs: build
     steps:
