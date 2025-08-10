@@ -12,14 +12,14 @@ import (
 	"tg-bot/useCases/visitCommitment"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error loading .env file")
-	}
+	//todo - handle load env on dev env, and for production
+	//err := godotenv.Load()
+	//if err != nil {
+	//	panic("Error loading .env file")
+	//}
 
 	db := db.ConnectDB()
 	b := bot.ConnectBot()
