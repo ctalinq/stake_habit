@@ -5,11 +5,6 @@ services:
     build:
       context: .
       dockerfile: ./client/Dockerfile
-      args:
-        VITE_COMMITER_CONTRACT_ADDRESS: ${VITE_COMMITER_CONTRACT_ADDRESS}
-        VITE_TON_NETWORK: ${VITE_TON_NETWORK}
-        VITE_API_ADDRESS: ${VITE_API_ADDRESS}
-        VITE_MANIFEST_URL: ${VITE_MANIFEST_URL}
     ports:
       - "5173:5173"
 
@@ -33,11 +28,11 @@ services:
       retries: 10
 
   migrate:
-    image: migrate/migrate
+    build:
+      context: .
+      dockerfile: ./migrate/Dockerfile
     networks:
       - stake_habit
-    volumes:
-      - ./tg-bot/migrations:/migrations
     command:
       [
         "-path",
@@ -46,6 +41,9 @@ services:
         "postgres://postgres:postgres@postgres:5432/stake_habit?sslmode=disable",
         "up",
       ]
+    depends_on:
+      postgres:
+        condition: service_healthy
     links:
       - postgres
 
@@ -53,14 +51,6 @@ services:
     build:
       context: ./tg-bot
       dockerfile: ./Dockerfile
-      args:
-        COMMITMENT_LINK_PREFIX: ${COMMITMENT_LINK_PREFIX}
-        TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
-        DB_HOST: ${DB_HOST}
-        DB_PORT: ${DB_PORT}
-        DB_USER: ${DB_USER}
-        DB_PASSWORD: ${DB_PASSWORD}
-        DB_NAME: ${DB_NAME}
     ports:
       - "5174:5174"
     networks:
@@ -70,6 +60,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    command: ["/tg-bot"]
 
 volumes:
   pgdata:
