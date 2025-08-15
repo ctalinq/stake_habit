@@ -4,10 +4,12 @@ import { useTranslation } from "react-i18next";
 import { Button } from "~/components";
 
 interface TonConnectButtonProps {
+  className?: string;
   onConnectStart: () => void;
 }
 
 export default function TonConnectButton({
+  className,
   onConnectStart,
 }: TonConnectButtonProps) {
   const [tonConnectUI] = useTonConnectUI();
@@ -24,7 +26,7 @@ export default function TonConnectButton({
   }, [wallet]);
 
   return (
-    <Button onClick={handleClick}>
+    <Button className={className} onClick={handleClick}>
       {wallet ? t("disconnectTON") : t("connectTON")}
     </Button>
   );

@@ -48,17 +48,15 @@ const NavbarLayout = () => {
   return (
     <Container>
       <div
-        className={`flex justify-between align-center ${
-          isFullscreen ? "mt-25" : "mt-4"
-        } mb-4`}
+        className={`flex align-center ${isFullscreen ? "mt-25" : "mt-4"} mb-4`}
       >
         <img
           src={launchParams.tgWebAppData.user.photo_url}
           alt="User Avatar"
           className="w-12 h-12 avatar-ring"
         />
-        <TonConnectButton onConnectStart={() => {}} />
         <ThemeToggle />
+        <TonConnectButton className="ml-auto" onConnectStart={() => {}} />
       </div>
       <Outlet />
     </Container>
