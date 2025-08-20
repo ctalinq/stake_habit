@@ -1,4 +1,4 @@
-package getCommitmentAddressesByWalletAddress
+package getCommitments
 
 import (
 	"log"
@@ -11,21 +11,32 @@ import (
 )
 
 type CommitmentDTO struct {
+	WalletAddress     string `db:"wallet_address" json:"wallet_address" binding:"required"`
+	UserPhotoURL      string `db:"tg_user_photo_link" json:"tg_user_photo_link"`
 	CommitmentAddress string `db:"commitment_address" json:"commitment_address" binding:"required"`
+	CreatedAt         string `db:"created_at" json:"created_at" binding:"required"`
+	UserId            string `db:"tg_user_id" json:"tg_user_id" binding:"required"`
+	IsActive          bool   `db:"is_active" json:"is_active" binding:"required"`
 }
 
-type GetCommitmentAddressesByWalletAddressUseCase struct {
+type GetCommitmentsUseCase struct {
 	DB *sqlx.DB
 }
 
-func NewGetCommitmentAddressesByWalletAddressUseCase(db *sqlx.DB) *GetCommitmentAddressesByWalletAddressUseCase {
-	return &GetCommitmentAddressesByWalletAddressUseCase{
+func NewGetCommitmentsUseCase(db *sqlx.DB) *GetCommitmentsUseCase {
+	return &GetCommitmentsUseCase{
 		DB: db,
 	}
 }
 
-func (s *GetCommitmentAddressesByWalletAddressUseCase) GetCommitmentAddressesByWalletAddress(c *gin.Context) {
-	address := c.Param("address")
+func (s *GetCommitmentsUseCase) GetCommitments(c *gin.Context) {
+	walletAddress := c.Query("walletAddress")
+
+	if walletAddress == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Wallet address is required"})
+		return
+	}
+
 	pageQuery := c.DefaultQuery("page", "0")
 
 	pageNumber, err := strconv.Atoi(pageQuery)
@@ -44,7 +55,7 @@ func (s *GetCommitmentAddressesByWalletAddressUseCase) GetCommitmentAddressesByW
 
 	query := `
 		SELECT
-			commitments.commitment_address
+			*
 		FROM
 			commitments
 		WHERE
@@ -55,7 +66,7 @@ func (s *GetCommitmentAddressesByWalletAddressUseCase) GetCommitmentAddressesByW
 		LIMIT 5 OFFSET $3
 	`
 
-	err = s.DB.Select(&commitments, query, address, initData.User.ID, pageNumber*5)
+	err = s.DB.Select(&commitments, query, walletAddress, initData.User.ID, pageNumber*5)
 
 	if err != nil {
 		log.Println("Db: ", err)
@@ -63,11 +74,5 @@ func (s *GetCommitmentAddressesByWalletAddressUseCase) GetCommitmentAddressesByW
 		return
 	}
 
-	var commitmentAddresses []string
-
-	for _, commitment := range commitments {
-		commitmentAddresses = append(commitmentAddresses, commitment.CommitmentAddress)
-	}
-
-	c.JSON(http.StatusOK, commitmentAddresses)
+	c.JSON(http.StatusOK, commitments)
 }

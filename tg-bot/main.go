@@ -4,8 +4,9 @@ import (
 	"tg-bot/infra/bot"
 	"tg-bot/infra/db"
 	telegramAuthMiddeware "tg-bot/telegramAuthMiddleware"
-	"tg-bot/useCases/getCommitmentAddressesByWalletAddress"
-	"tg-bot/useCases/getCommitmentByAddress"
+
+	"tg-bot/useCases/getCommitment"
+	"tg-bot/useCases/getCommitments"
 	"tg-bot/useCases/getVisitors"
 	"tg-bot/useCases/saveCommitment"
 	"tg-bot/useCases/setCommitmentIsActive"
@@ -32,15 +33,18 @@ func main() {
 
 	saveCommitment := saveCommitment.NewSaveCommitmentUserCase(db, b)
 	setCommitmentIsActive := setCommitmentIsActive.NewSetCommitmentIsActiveUserCase(db)
-	getCommitment := getCommitmentByAddress.NewGetCommitmentUserCase(db)
-	getVisitors := getVisitors.NewGetVisitorsCase(db)
+
+	getCommitment := getCommitment.NewGetCommitmentUseCase(db)
+	getCommiments := getCommitments.NewGetCommitmentsUseCase(db)
+
+	getVisitors := getVisitors.NewGetVisitorsUseCase(db)
 	visitCommitment := visitCommitment.NewVisitCommitmentUserCase(db)
-	getCommimentAddresses := getCommitmentAddressesByWalletAddress.NewGetCommitmentAddressesByWalletAddressUseCase(db)
 
 	r.POST("/wallets/:address/commitments", saveCommitment.SaveCommitment)
-	r.GET("/wallets/:address/commitments/addresses", getCommimentAddresses.GetCommitmentAddressesByWalletAddress)
 	r.GET("/visitors", getVisitors.GetVisitors)
-	r.GET("/commitments/:address", getCommitment.GetCommitmentByAddress)
+
+	r.GET("/commitments", getCommiments.GetCommitments)
+	r.GET("/commitments/:address", getCommitment.GetCommitment)
 	r.POST("/commitments/:address/visits", visitCommitment.VisitCommitment)
 	r.POST("/commitments/:address/success", setCommitmentIsActive.SetCommitmentIsActive)
 

@@ -6,5 +6,9 @@ export interface VisitorDTO {
 }
 
 export interface CommitmentDTO {
-  users: VisitorDTO[];
+  wallet_address: string;
+  tg_user_photo_link?: string;
+  commitment_address: string;
+  tg_user_id: string;
+  is_active: boolean;
 }

@@ -1,4 +1,4 @@
-package getCommitmentByAddress
+package getCommitment
 
 import (
 	"log"
@@ -14,17 +14,18 @@ type CommitmentDTO struct {
 	CommitmentAddress string `db:"commitment_address" json:"commitment_address" binding:"required"`
 	UserId            string `db:"tg_user_id" json:"tg_user_id" binding:"required"`
 	IsActive          bool   `db:"is_active" json:"is_active" binding:"required"`
+	CreatedAt         string `db:"created_at" json:"created_at" binding:"required"`
 }
 
 type GetCommitmentUseCase struct {
 	DB *sqlx.DB
 }
 
-func NewGetCommitmentUserCase(db *sqlx.DB) *GetCommitmentUseCase {
+func NewGetCommitmentUseCase(db *sqlx.DB) *GetCommitmentUseCase {
 	return &GetCommitmentUseCase{DB: db}
 }
 
-func (s *GetCommitmentUseCase) GetCommitmentByAddress(c *gin.Context) {
+func (s *GetCommitmentUseCase) GetCommitment(c *gin.Context) {
 	var commitments []CommitmentDTO
 	address := c.Param("address")
 

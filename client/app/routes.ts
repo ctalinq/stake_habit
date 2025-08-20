@@ -6,7 +6,7 @@ export default [
       layout("layouts/navbarLayout.tsx", [
         route("/", "home/home.tsx"),
         route("/create", "create/create.tsx"),
-        route("/commitments/:commitmentAddress", "commitments/commitments.tsx"),
+        route("/commitments/:commitmentAddress", "commitments/commitment.tsx"),
       ]),
     ]),
   ]),

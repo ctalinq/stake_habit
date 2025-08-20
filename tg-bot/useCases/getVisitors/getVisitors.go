@@ -19,7 +19,7 @@ type GetVisitorsUseCase struct {
 	DB *sqlx.DB
 }
 
-func NewGetVisitorsCase(db *sqlx.DB) *GetVisitorsUseCase {
+func NewGetVisitorsUseCase(db *sqlx.DB) *GetVisitorsUseCase {
 	return &GetVisitorsUseCase{DB: db}
 }
 

@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Card, Link } from "~/components";
 import CommitmentRow from "./commitmentRow";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { VisitorDTO } from "~/types";
+import type { CommitmentDTO, VisitorDTO } from "~/types";
 
 export default function Home() {
   const { t } = useTranslation("home");
@@ -18,7 +18,7 @@ export default function Home() {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useInfiniteQuery<string[]>({
+  } = useInfiniteQuery<CommitmentDTO[]>({
     enabled: !!wallet?.account.address,
     queryKey: ["commitments", wallet?.account.address.toString()],
     initialPageParam: 0,
@@ -31,9 +31,9 @@ export default function Home() {
     queryFn: async ({ pageParam }) => {
       if (wallet?.account) {
         const response = await fetch(
-          `/api/wallets/${btoa(
+          `/api/commitments?walletAddress=${btoa(
             wallet.account.address
-          )}/commitments/addresses?page=${pageParam}`,
+          )}&page=${pageParam}`,
           {
             headers: {
               Authorization: `tma ${initData}`,
@@ -64,7 +64,9 @@ export default function Home() {
       const page = commitmentsData.pages[commitmentsData.pages.length - 1];
 
       const response = await fetch(
-        `/api/visitors?commitmentAddresses=${page.join(",")}`,
+        `/api/visitors?commitmentAddresses=${page
+          .map((commitment) => commitment.commitment_address)
+          .join(",")}`,
         {
           headers: {
             Authorization: `tma ${initData}`,
@@ -128,11 +130,11 @@ export default function Home() {
           <h2 className="text-xl text-blue-400 dark:text-white font-bold mb-4">
             {t("yourCommitments.title")}
           </h2>
-          {commitments.map((commitmentAddress) => (
+          {commitments.map((commitment) => (
             <CommitmentRow
-              key={commitmentAddress}
-              commitmentAddress={commitmentAddress}
-              visitors={visitorsMap[commitmentAddress]}
+              key={commitment.commitment_address}
+              commitmentAddress={commitment.commitment_address}
+              visitors={visitorsMap[commitment.commitment_address]}
             />
           ))}
         </Card>
