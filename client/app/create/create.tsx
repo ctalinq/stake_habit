@@ -65,7 +65,7 @@ export default function Create() {
     }) => {
       if (wallet?.account) {
         const response = await fetch(
-          `/api/wallets/${btoa(wallet.account.address)}/commitments`,
+          `/api/commitments?walletAddress=${btoa(wallet.account.address)}`,
           {
             method: "POST",
             headers: {

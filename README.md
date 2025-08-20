@@ -2,7 +2,6 @@
 ## todo-orch
 
 ### API IMPROVEMENTS
-* Move `getCommitmentByAddress` and `getCommitmentAddressesByWalletAddress` to `getCommitments` using query
 * Move `setCommitmentIsActive` to `updateCommitment`
 * Move `saveCommitment` to `createCommitment`
 

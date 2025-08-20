@@ -1,4 +1,4 @@
-package saveCommitment
+package createCommitment
 
 import (
 	"encoding/base64"
@@ -20,17 +20,22 @@ type CommitmentDTO struct {
 	RecipientKeys     []string `json:"recipient_keys" binding:"required"`
 }
 
-type SaveCommitmentUserCase struct {
+type CreateCommitmentUserCase struct {
 	DB  *sqlx.DB
 	BOT *gotgbot.Bot
 }
 
-func NewSaveCommitmentUserCase(db *sqlx.DB, bot *gotgbot.Bot) *SaveCommitmentUserCase {
-	return &SaveCommitmentUserCase{DB: db, BOT: bot}
+func NewCreateCommitmentUseCase(db *sqlx.DB, bot *gotgbot.Bot) *CreateCommitmentUserCase {
+	return &CreateCommitmentUserCase{DB: db, BOT: bot}
 }
 
-func (s *SaveCommitmentUserCase) SaveCommitment(c *gin.Context) {
-	walletAddress := c.Param("address")
+func (s *CreateCommitmentUserCase) CreateCommitment(c *gin.Context) {
+	walletAddress := c.Query("walletAddress")
+	if walletAddress == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing wallet address"})
+		return
+	}
+
 	var commitment CommitmentDTO
 
 	if err := c.ShouldBind(&commitment); err != nil {
