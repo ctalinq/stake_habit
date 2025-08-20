@@ -8,7 +8,7 @@ import Failed from "~/commitments/icons/failed.svg?react";
 import LoadingSvg from "~/home/icons/loading.svg?react";
 
 import { useCommitmentContract } from "~/hooks/useCommitmentContract";
-import type { CommitmentDTO } from "~/types";
+import type { VisitorDTO } from "~/types";
 import { useState } from "react";
 import { useTonSender } from "~/hooks/useTonSender";
 
@@ -68,10 +68,10 @@ const CommitmentInfo = ({
 
 function CommitmentRow({
   commitmentAddress,
-  commitment,
+  visitors,
 }: {
   commitmentAddress: string;
-  commitment: CommitmentDTO;
+  visitors?: VisitorDTO[];
 }) {
   const { t } = useTranslation("home");
 
@@ -157,23 +157,21 @@ function CommitmentRow({
       ) : (
         <div className="w-54 h-6 skeleton" />
       )}
-      {commitment.users.length > 0 && (
+      {visitors && visitors.length > 0 && (
         <div className="absolute right-0 top-14 flex items-center">
           <p className="text-sm text-gray-500 dark:text-white mr-4">
             {t("viewers")}
           </p>
-          {commitment.users.map((user) => (
-            <>
-              <div key={user.full_name} style={{ marginLeft: "-10px" }}>
-                {user.photo_url && (
-                  <img
-                    src={user.photo_url}
-                    alt={user.full_name}
-                    className="w-7 h-7 rounded-full"
-                  />
-                )}
-              </div>
-            </>
+          {visitors.map((visitor) => (
+            <div key={visitor.tg_user_id} style={{ marginLeft: "-10px" }}>
+              {visitor.tg_user_photo_link && (
+                <img
+                  src={visitor.tg_user_photo_link}
+                  alt={visitor.tg_user_full_name}
+                  className="w-7 h-7 rounded-full"
+                />
+              )}
+            </div>
           ))}
         </div>
       )}
