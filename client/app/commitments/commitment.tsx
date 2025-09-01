@@ -80,12 +80,16 @@ function Commitment({
     queryKey: ["commitment_visit"],
     queryFn: () => {
       return fetch(
-        `/api/commitments/${commitmentContract?.address?.toString()}/visits`,
+        `/api/commitments/${commitmentContract?.address?.toString()}`,
         {
-          method: "POST",
+          method: "PATCH",
           headers: {
             Authorization: `tma ${initData}`,
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            visited: true,
+          }),
         }
       );
     },

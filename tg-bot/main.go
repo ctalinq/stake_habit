@@ -9,8 +9,7 @@ import (
 	"tg-bot/useCases/getCommitment"
 	"tg-bot/useCases/getCommitments"
 	"tg-bot/useCases/getVisitors"
-	"tg-bot/useCases/setCommitmentIsActive"
-	"tg-bot/useCases/visitCommitment"
+	"tg-bot/useCases/updateCommitment"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -32,22 +31,17 @@ func main() {
 	r.Use(telegramAuthMiddeware.AuthMiddleware())
 
 	createCommitment := createCommitment.NewCreateCommitmentUseCase(db, b)
-	setCommitmentIsActive := setCommitmentIsActive.NewSetCommitmentIsActiveUserCase(db)
-
+	updateCommitment := updateCommitment.NewUpdateCommitmentUserCase(db)
 	getCommitment := getCommitment.NewGetCommitmentUseCase(db)
 	getCommiments := getCommitments.NewGetCommitmentsUseCase(db)
 
-	getVisitors := getVisitors.NewGetVisitorsUseCase(db)
-	visitCommitment := visitCommitment.NewVisitCommitmentUserCase(db)
-
-	r.GET("/visitors", getVisitors.GetVisitors)
-
 	r.GET("/commitments", getCommiments.GetCommitments)
-	r.GET("/commitments/:address", getCommitment.GetCommitment)
-
 	r.POST("/commitments", createCommitment.CreateCommitment)
-	r.POST("/commitments/:address/visits", visitCommitment.VisitCommitment)
-	r.POST("/commitments/:address/success", setCommitmentIsActive.SetCommitmentIsActive)
+	r.GET("/commitments/:address", getCommitment.GetCommitment)
+	r.PATCH("/commitments/:address", updateCommitment.UpdateCommitment)
+
+	getVisitors := getVisitors.NewGetVisitorsUseCase(db)
+	r.GET("/visitors", getVisitors.GetVisitors)
 
 	r.Run(":5174")
 }

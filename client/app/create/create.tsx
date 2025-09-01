@@ -89,13 +89,16 @@ export default function Create() {
     mutationFn: async () => {
       if (commitmentContract?.address) {
         await fetch(
-          `/api/commitments/${commitmentContract?.address.toString()}/success`,
+          `/api/commitments/${commitmentContract?.address.toString()}`,
           {
-            method: "POST",
+            method: "PATCH",
             headers: {
               "Content-Type": "application/json",
               Authorization: `tma ${initData}`,
             },
+            body: JSON.stringify({
+              active: true,
+            }),
           }
         );
       }
