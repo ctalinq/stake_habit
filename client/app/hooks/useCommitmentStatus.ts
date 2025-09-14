@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { CommitmentStatus } from "./types";
+import type { CommitmentStatus } from "~/types";
 
 export const useCommitmentStatus = ({
   status,

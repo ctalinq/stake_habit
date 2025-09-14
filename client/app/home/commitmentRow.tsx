@@ -1,16 +1,15 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Address } from "@ton/core";
-import { useTranslation } from "react-i18next";
-import { useCommitmentStatus } from "~/commitments/useCommitmentStatus";
+import { useCommitmentStatus } from "~/hooks/useCommitmentStatus";
+import { useCommitmentContract } from "~/hooks/useCommitmentContract";
+import { useTonSender } from "~/hooks/useTonSender";
 import InProcess from "~/commitments/icons/inProcess.svg?react";
 import Succeded from "~/commitments/icons/succeeded.svg?react";
 import Failed from "~/commitments/icons/failed.svg?react";
 import LoadingSvg from "~/home/icons/loading.svg?react";
-
-import { useCommitmentContract } from "~/hooks/useCommitmentContract";
 import type { VisitorDTO } from "~/types";
-import { useState } from "react";
-import { useTonSender } from "~/hooks/useTonSender";
 
 const CommitmentInfo = ({
   title,

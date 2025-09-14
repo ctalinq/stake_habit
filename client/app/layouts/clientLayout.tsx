@@ -5,9 +5,9 @@ import mockEnv from "./mockEnv";
 import { Outlet } from "react-router";
 import HomeSkeleton from "~/home/homeSkeleton";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
-import { ThemeProvider } from "~/contexts/useTheme";
 import { AppRoot } from "@telegram-apps/telegram-ui";
-import { TonClientProvider } from "~/contexts/useTonClient";
+import { ThemeProvider } from "~/hooks/useTheme";
+import { TonClientProvider } from "~/hooks/useTonClient";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();

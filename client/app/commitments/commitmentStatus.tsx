@@ -6,7 +6,7 @@ import Loading from "./icons/loading.svg?react";
 import Treasure from "./icons/treasure.svg?react";
 import { useTonWallet } from "@tonconnect/ui-react";
 import { TonConnectButton } from "~/containers";
-import { useCommitmentStatus } from "./useCommitmentStatus";
+import { useCommitmentStatus } from "~/hooks/useCommitmentStatus";
 
 const CommitmentStatus = ({
   status,
