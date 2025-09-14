@@ -1,4 +1,5 @@
 import type { Preview } from "@storybook/react-vite";
+import { INITIAL_VIEWPORTS } from "storybook/viewport";
 import { sb } from "storybook/test";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "~/i18n";
@@ -20,6 +21,12 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
+    viewport: {
+      options: INITIAL_VIEWPORTS,
+    },
+  },
+  initialGlobals: {
+    viewport: { value: "iphone14", isRotated: false },
   },
   decorators: [
     (Story) => (
