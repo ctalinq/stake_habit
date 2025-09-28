@@ -20,10 +20,10 @@ export default function ClientLayout() {
       mockEnv();
     }
 
-    //if (import.meta.env.DEV) {
-    const eruda = await import("eruda");
-    eruda.default.init();
-    //}
+    if (import.meta.env.DEV) {
+      const eruda = await import("eruda");
+      eruda.default.init();
+    }
 
     init();
     setIsInitialized(true);

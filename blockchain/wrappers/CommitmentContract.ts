@@ -18,13 +18,14 @@ export type CommitmentContractConfig = {
   title: string;
   description: string;
   dueDate: number;
+  status?: number;
 };
 
 export function commitmentContractConfigToCell(
   config: CommitmentContractConfig
 ): Cell {
   return beginCell()
-    .storeUint(0, 2)
+    .storeUint(config.status ?? 0, 2)
     .storeAddress(config.stakerAddress)
     .storeRef(beginCell().storeStringTail(config.title).endCell())
     .storeRef(beginCell().storeStringTail(config.description).endCell())

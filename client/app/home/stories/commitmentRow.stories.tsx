@@ -4,6 +4,7 @@ import { useCommitmentContract } from "~/hooks/useCommitmentContract";
 import { mocked } from "storybook/internal/test";
 import {
   createFailedCommitment,
+  createInProgressCommitment,
   createSuccessCommitment,
 } from "~/__mocks__/commitments";
 
@@ -13,11 +14,18 @@ const TEST_COMMITMENT_ADDRESS =
 const meta = {
   title: "home/CommitmentRow",
   component: CommitmentRow,
-  parameters: {
-    layout: "centered",
-  },
   tags: ["autodocs"],
   argTypes: {},
+  parameters: {
+    layout: "fullscreen",
+  },
+  decorators: [
+    (Story) => (
+      <div className="p-3">
+        <Story />
+      </div>
+    ),
+  ],
 } satisfies Meta<typeof CommitmentRow>;
 
 export default meta;
@@ -34,7 +42,18 @@ export const FailedCommitment: Story = {
   },
 };
 
-export const SuccessCommitment: Story = {
+export const InProgressCommitment: Story = {
+  args: {
+    commitmentAddress: TEST_COMMITMENT_ADDRESS,
+    visitors: [],
+  },
+  beforeEach: async () => {
+    const contract = await createInProgressCommitment();
+    mocked(useCommitmentContract).mockReturnValue(contract);
+  },
+};
+
+export const SuccessfulCommitment: Story = {
   args: {
     commitmentAddress: TEST_COMMITMENT_ADDRESS,
     visitors: [],

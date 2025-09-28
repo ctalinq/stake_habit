@@ -1,4 +1,4 @@
-import type { Preview } from "@storybook/react-vite";
+import type { Decorator, Preview } from "@storybook/react-vite";
 import { INITIAL_VIEWPORTS } from "storybook/viewport";
 import { sb } from "storybook/test";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -12,6 +12,19 @@ sb.mock(import("../app/hooks/useCommitmentContract.ts"));
 sb.mock(import("../app/hooks/useTonSender.tsx"));
 
 const queryClient = new QueryClient();
+
+export const withTheme: Decorator = (Story, context) => {
+  const theme = context.globals.theme;
+
+  if (theme === "dark") {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+
+  document.body.classList.add("gradient-bg");
+  return <Story />;
+};
 
 const preview: Preview = {
   parameters: {
@@ -28,7 +41,23 @@ const preview: Preview = {
   initialGlobals: {
     viewport: { value: "iphone14", isRotated: false },
   },
+  globalTypes: {
+    theme: {
+      name: "Theme",
+      description: "Global theme for components",
+      defaultValue: "light",
+      toolbar: {
+        icon: "mirror",
+        items: [
+          { value: "light", title: "Light" },
+          { value: "dark", title: "Dark" },
+        ],
+        showName: true,
+      },
+    },
+  },
   decorators: [
+    withTheme,
     (Story) => (
       <QueryClientProvider client={queryClient}>
         <Story />

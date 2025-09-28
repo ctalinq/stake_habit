@@ -4,7 +4,13 @@ import { hex as commitmentContractHex } from "blockchain/commitment";
 import { blockchain, deployer } from "./blockchain";
 import { generateRecipientsKeyList } from "blockchain/utils";
 
-const createCommitment = async ({ dueDate }: { dueDate: number }) => {
+const createCommitment = async ({
+  dueDate,
+  status,
+}: {
+  dueDate: number;
+  status?: number;
+}) => {
   const stakerWallet = await blockchain.treasury("stakerAddress");
 
   const commitmentCodeCell = Cell.fromBoc(
@@ -18,6 +24,7 @@ const createCommitment = async ({ dueDate }: { dueDate: number }) => {
   const commitmentContract = blockchain.openContract(
     await CommitmentContract.createFromConfig(
       {
+        status,
         stakerAddress: stakerWallet.address,
         title: "testsdfs",
         description: "test",
@@ -38,6 +45,10 @@ export const createFailedCommitment = async () => {
   return createCommitment({ dueDate: Date.now() });
 };
 
-export const createSuccessCommitment = async () => {
+export const createInProgressCommitment = async () => {
   return createCommitment({ dueDate: Date.now() + 1000 * 60 * 60 * 24 });
+};
+
+export const createSuccessCommitment = async () => {
+  return createCommitment({ dueDate: Date.now() + 24, status: 1 });
 };
