@@ -3,6 +3,7 @@ import {
   useLaunchParams,
   backButton,
   viewport,
+  swipeBehavior,
 } from "@telegram-apps/sdk-react";
 import { Container, ThemeToggle } from "~/components";
 import { Outlet, useLocation, useNavigate } from "react-router";
@@ -40,6 +41,9 @@ const NavbarLayout = () => {
           });
         }
       });
+    }
+    if (swipeBehavior.enableVertical.isAvailable()) {
+      swipeBehavior.disableVertical();
     }
   }, []);
 

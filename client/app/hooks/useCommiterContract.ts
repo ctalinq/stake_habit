@@ -1,7 +1,7 @@
 import { Address, type OpenedContract } from "@ton/core";
 import { CommiterContract } from "blockchain/commiterContract";
 import { useEffect, useState } from "react";
-import { useTonClient } from "~/contexts/useTonClient";
+import { useTonClient } from "~/hooks/useTonClient";
 
 export const useCommiterContract = () => {
   const tonClient = useTonClient();

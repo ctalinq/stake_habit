@@ -14,7 +14,7 @@
 }
 
 .gradient-bg {
-  @apply bg-gradient-to-br from-gray-50 via-gray-100 to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950;
+  @apply bg-gradient-to-br from-gray-50 via-gray-100 to-blue-50 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950 bg-no-repeat;
 }
 
 .btn-base {

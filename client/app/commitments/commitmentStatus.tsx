@@ -6,7 +6,7 @@ import Loading from "./icons/loading.svg?react";
 import Treasure from "./icons/treasure.svg?react";
 import { useTonWallet } from "@tonconnect/ui-react";
 import { TonConnectButton } from "~/containers";
-import { useCommitmentStatus } from "./useCommitmentStatus";
+import { useCommitmentStatus } from "~/hooks/useCommitmentStatus";
 
 const CommitmentStatus = ({
   status,
@@ -57,8 +57,8 @@ const CommitmentStatus = ({
       )}
       {commitmentStatus === "failed" && wallet && (
         <>
-          <Failed width={50} height={50} className="fill-amber-500  mb-4" />
-          <p className="text-amber-500 text-2xl fontfont-bold mb-5">
+          <Failed width={50} height={50} className="fill-red-500  mb-4" />
+          <p className="text-red-500 text-2xl fontfont-bold mb-5">
             {t("failed")}
           </p>
           {!alreadyRewardedKeys.includes(commitmentKey) ? (

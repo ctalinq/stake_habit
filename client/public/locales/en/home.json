@@ -4,9 +4,5 @@
     "title": "Your Commitments",
     "description": "Here you can see all your commitments"
   },
-  "commitment": {
-    "fail": "Fail",
-    "success": "Mark as Success"
-  },
   "viewers": "Viewers: "
 }

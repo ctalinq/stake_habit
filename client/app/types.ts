@@ -12,3 +12,5 @@ export interface CommitmentDTO {
   tg_user_id: string;
   is_active: boolean;
 }
+
+export type CommitmentStatus = "inProcess" | "success" | "failed" | "unknown";

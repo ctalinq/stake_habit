@@ -1,16 +1,19 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Address } from "@ton/core";
-import { useTranslation } from "react-i18next";
-import { useCommitmentStatus } from "~/commitments/useCommitmentStatus";
+import { useCommitmentStatus } from "~/hooks/useCommitmentStatus";
+import { useCommitmentContract } from "~/hooks/useCommitmentContract";
+import { useTonSender } from "~/hooks/useTonSender";
+import { useSwipeRow } from "~/hooks/useSwipeRow";
 import InProcess from "~/commitments/icons/inProcess.svg?react";
 import Succeded from "~/commitments/icons/succeeded.svg?react";
 import Failed from "~/commitments/icons/failed.svg?react";
-import LoadingSvg from "~/home/icons/loading.svg?react";
-
-import { useCommitmentContract } from "~/hooks/useCommitmentContract";
+import Loading from "~/home/icons/loading.svg?react";
+import Complete from "~/home/icons/complete.svg?react";
+import Fail from "~/home/icons/fail.svg?react";
+import Swipe from "~/home/icons/swipe.svg?react";
 import type { VisitorDTO } from "~/types";
-import { useState } from "react";
-import { useTonSender } from "~/hooks/useTonSender";
 
 const CommitmentInfo = ({
   title,
@@ -27,41 +30,64 @@ const CommitmentInfo = ({
   onFail: () => void;
   isPolling: boolean;
 }) => {
-  const { t } = useTranslation("home");
   const commitmentStatus = useCommitmentStatus({
     dueDate,
     status,
   });
 
+  const showInProgressCommitmentControls =
+    commitmentStatus === "inProcess" && !isPolling;
+  const { onTouchEnd, onTouchMove, onTouchStart, isSwiped } = useSwipeRow({
+    enabled: showInProgressCommitmentControls,
+  });
+
   return (
     <div className="flex items-center">
-      <div className="mr-1">
-        {commitmentStatus === "inProcess" && (
-          <InProcess className="w-7 h-7 mr-2 fill-indigo-700" />
-        )}
-        {commitmentStatus === "success" && (
-          <Succeded className="w-7 h-7 mr-2 fill-emerald-700" />
-        )}
-        {commitmentStatus === "failed" && (
-          <Failed className="w-7 h-7 mr-2 fill-amber-500" />
+      <div
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onTouchStart={onTouchStart}
+        className="flex basis-0 grow-1 items-center"
+      >
+        <div className="mr-1">
+          {commitmentStatus === "inProcess" && (
+            <InProcess className="w-7 h-7 mr-2 fill-indigo-700" />
+          )}
+          {commitmentStatus === "success" && (
+            <Succeded className="w-7 h-7 mr-2 fill-emerald-700" />
+          )}
+          {commitmentStatus === "failed" && (
+            <Failed className="w-7 h-7 mr-2 fill-red-500" />
+          )}
+        </div>
+        <div className="grow-1">
+          <p className="truncate text text-lg text-black dark:text-white">
+            {title}
+          </p>
+        </div>
+        {!isSwiped && showInProgressCommitmentControls && (
+          <Swipe className="text-zinc-500" />
         )}
       </div>
-      <div>
-        <p className="truncate text text-lg text-black dark:text-white">
-          {title}
-        </p>
-        {commitmentStatus === "inProcess" && !isPolling && (
-          <div className="flex gap-4 text-sm">
-            <button onClick={onSuccess} className="text-emerald-700 underline">
-              {t("commitment.success")}
-            </button>
-            <button onClick={onFail} className="text-red-600 underline">
-              {t("commitment.fail")}
-            </button>
-          </div>
-        )}
-        {isPolling && <LoadingSvg className="w-7 h-7" />}
+      <div
+        className={`h-12 flex gap-1 items-center overflow-hidden transition-[width] duration-300 ease-in-out ${
+          isSwiped ? "w-25" : "w-0"
+        }`}
+      >
+        <button
+          className="h-12 w-12 bg-emerald-700 flex items-center justify-center rounded-sm"
+          onClick={onSuccess}
+        >
+          <Complete className="w-9 h-9 text-white" />
+        </button>
+        <button
+          className="h-12 w-12 bg-red-700 flex items-center justify-center rounded-sm"
+          onClick={onFail}
+        >
+          <Fail className="w-9 h-9 text-white" />
+        </button>
       </div>
+      {isPolling && <Loading className="w-7 h-7" />}
     </div>
   );
 };
