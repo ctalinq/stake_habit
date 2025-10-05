@@ -62,7 +62,16 @@ function mockEnv() {
           ["auth_date", ((new Date().getTime() / 1000) | 0).toString()],
           ["hash", "some-hash"],
           ["signature", "some-signature"],
-          ["user", JSON.stringify({ id: 1, first_name: "Vladislav" })],
+          [
+            "user",
+            JSON.stringify({
+              id: 1,
+              phote_url:
+                "https://avatarfiles.alphacoders.com/152/thumb-1920-152177.jpg",
+              first_name: "Bob",
+              last_name: "Sponge",
+            }),
+          ],
         ]).toString(),
       ],
       ["tgWebAppVersion", "8.4"],

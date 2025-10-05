@@ -6,10 +6,10 @@ import Spinner from "~/components/icons/spinner.svg?react";
 import CommitmentStatus from "./commitmentStatus";
 import { useTranslation } from "react-i18next";
 import { useCallback, useMemo, useState } from "react";
-import { TruncatedText } from "~/components";
 import { useRawInitData } from "@telegram-apps/sdk-react";
 import { formatDateToString } from "~/util";
 import { useTonSender } from "~/hooks/useTonSender";
+import { useCommitmentUserData } from "~/hooks/useCommitmentUserData";
 
 function LoadingPlaceholder() {
   const { t } = useTranslation("commitments");
@@ -59,22 +59,7 @@ function Commitment({
     refetchInterval: 5000,
   });
 
-  const { data: userData } = useQuery({
-    queryKey: ["commitment_user_data"],
-    queryFn: async () => {
-      const response = await fetch(
-        `/api/commitments/${commitmentContract?.address?.toString()}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `tma ${initData}`,
-          },
-        }
-      );
-
-      return await response.json();
-    },
-  });
+  const { data: userData } = useCommitmentUserData(commitmentContract);
 
   useQuery({
     queryKey: ["commitment_visit"],
@@ -109,14 +94,11 @@ function Commitment({
             <img
               src={userData?.tg_user_photo_link}
               alt="User Avatar"
-              className="w-12 h-12 avatar-ring mr-3 mb-6"
+              className="w-12 h-12 avatar-ring mr-3 mb-6 shrink-0"
             />
-            <TruncatedText
-              maxLength={15}
-              className="text-4xl mb-2 text-black dark:text-white"
-            >
+            <p className="text-xl mb-2 text-black dark:text-white">
               {commitmentData.title}
-            </TruncatedText>
+            </p>
           </div>
           <p className="mb-4 text-black dark:text-white">
             {commitmentData.description}
@@ -148,7 +130,7 @@ function Commitment({
   );
 }
 
-export default function Commitments({
+export default function CommitmentPage({
   params,
 }: {
   params: { commitmentAddress: string };

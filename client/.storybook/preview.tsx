@@ -2,13 +2,17 @@ import type { Decorator, Preview } from "@storybook/react-vite";
 import { INITIAL_VIEWPORTS } from "storybook/viewport";
 import { sb } from "storybook/test";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import mockEnv from "../app/layouts/mockEnv";
 import "~/i18n";
 import "~/app.css";
 
 import { Buffer } from "buffer";
+import { TonConnectUIProvider } from "@tonconnect/ui-react";
 window.Buffer = Buffer;
 
+mockEnv();
 sb.mock(import("../app/hooks/useCommitmentContract.ts"));
+sb.mock(import("../app/hooks/useCommitmentUserData.ts"));
 sb.mock(import("../app/hooks/useTonSender.tsx"));
 
 const queryClient = new QueryClient();
@@ -60,7 +64,9 @@ const preview: Preview = {
     withTheme,
     (Story) => (
       <QueryClientProvider client={queryClient}>
-        <Story />
+        <TonConnectUIProvider manifestUrl={"https://example.com/manifest.json"}>
+          <Story />
+        </TonConnectUIProvider>
       </QueryClientProvider>
     ),
   ],
