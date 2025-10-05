@@ -13,7 +13,7 @@ export default function TruncatedText({
   children,
   className = "",
 }: TruncatedTextProps) {
-  const baseStyles = "relative inline-block";
+  const baseStyles = "overflow-hidden text-nowrap ellipsis";
 
   return <div className={`${baseStyles} ${className}`}>{children}</div>;
 }

@@ -26,7 +26,7 @@ const createCommitment = async ({
       {
         status,
         stakerAddress: stakerWallet.address,
-        title: "testsdfs",
+        title: "Successfull Commitment With Long Title",
         description: "test",
         dueDate: dueDateSeconds,
         recipientsList: recipientsKeyList,
