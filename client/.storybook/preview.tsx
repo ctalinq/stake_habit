@@ -11,6 +11,7 @@ import { TonConnectUIProvider } from "@tonconnect/ui-react";
 window.Buffer = Buffer;
 
 mockEnv();
+sb.mock(import("../app/hooks/useWallet.ts"));
 sb.mock(import("../app/hooks/useCommitmentContract.ts"));
 sb.mock(import("../app/hooks/useCommitmentUserData.ts"));
 sb.mock(import("../app/hooks/useTonSender.tsx"));

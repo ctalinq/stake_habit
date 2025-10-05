@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import CommitmentPage from "../commitment";
 import { mocked } from "storybook/internal/test";
-import { createSuccessCommitment } from "~/__mocks__/commitments";
+import {
+  createFailedCommitment,
+  createSuccessCommitment,
+} from "~/__mocks__/commitments";
 import { useCommitmentContract } from "~/hooks/useCommitmentContract";
 import { useCommitmentUserData } from "~/hooks/useCommitmentUserData";
+import useWallet from "~/hooks/useWallet";
 import avatar from "./avatar.png";
 
 const TEST_COMMITMENT_ADDRESS =
@@ -49,6 +53,25 @@ export const SuccessfulCommitment: Story = {
   beforeEach: async () => {
     const contract = await createSuccessCommitment();
     mocked(useCommitmentContract).mockReturnValue(contract);
+    mocked(useCommitmentUserData).mockReturnValue({
+      data: {
+        tg_user_photo_link: avatar,
+      },
+    });
+  },
+};
+
+export const FailedCommitment: Story = {
+  args: {
+    params: {
+      commitmentAddress: TEST_COMMITMENT_ADDRESS,
+    },
+  },
+  beforeEach: async () => {
+    const contract = await createFailedCommitment();
+    mocked(useCommitmentContract).mockReturnValue(contract);
+    //@ts-expect-error just return not empty object
+    mocked(useWallet).mockReturnValue({});
     mocked(useCommitmentUserData).mockReturnValue({
       data: {
         tg_user_photo_link: avatar,

@@ -47,11 +47,16 @@ function Commitment({
 
   useQuery({
     queryKey: ["commitment_rewards_polling"],
-    enabled: isGettingRewards,
+    enabled:
+      isGettingRewards &&
+      !commitmentData?.awardedKeyList.includes(commitmentKey),
     queryFn: async () => {
       const info = await commitmentContract.getInfo();
       if (info?.awardedKeyList.includes(commitmentKey)) {
-        queryClient.setQueryData(["commitment"], info);
+        queryClient.setQueryData(
+          ["commitment", commitmentContract?.address?.toString()],
+          info
+        );
         setIsGettingRewards(false);
       }
       return null;

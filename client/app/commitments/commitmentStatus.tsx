@@ -4,9 +4,9 @@ import Succeded from "./icons/succeeded.svg?react";
 import Failed from "./icons/failed.svg?react";
 import Loading from "./icons/loading.svg?react";
 import Treasure from "./icons/treasure.svg?react";
-import { useTonWallet } from "@tonconnect/ui-react";
 import { TonConnectButton } from "~/containers";
 import { useCommitmentStatus } from "~/hooks/useCommitmentStatus";
+import useWallet from "~/hooks/useWallet";
 
 const CommitmentStatus = ({
   status,
@@ -24,7 +24,7 @@ const CommitmentStatus = ({
   onGetReward: () => void;
 }) => {
   const { t } = useTranslation("commitments");
-  const wallet = useTonWallet();
+  const wallet = useWallet();
 
   const commitmentStatus = useCommitmentStatus({
     status,
