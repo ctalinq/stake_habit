@@ -20,3 +20,5 @@ export const useCommitmentContract = (address: Address | null) => {
 
   return commitmentContract;
 };
+
+export default useCommitmentContract;

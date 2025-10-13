@@ -1,4 +1,12 @@
 {
   "connectTON": "Connect Wallet",
-  "disconnectTON": "Disconnect Wallet"
+  "disconnectTON": "Disconnect Wallet",
+  "moreDots": "...",
+  "commitment": {
+    "status": {
+      "inProcess": "in Process",
+      "success": "Success",
+      "failed": "Failed"
+    }
+  }
 }

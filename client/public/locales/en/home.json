@@ -1,8 +1,10 @@
 {
   "commit": "commit",
+  "complete": "Complete",
+  "fail": "Fail",
   "yourCommitments": {
-    "title": "Your Commitments",
     "description": "Here you can see all your commitments"
   },
-  "viewers": "Viewers: "
+  "viewers": "Viewers({{count}}):",
+  "description": "Description:"
 }
