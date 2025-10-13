@@ -6,5 +6,6 @@
     "description": "Here you can see all your commitments"
   },
   "viewers": "Viewers({{count}}):",
-  "description": "Description:"
+  "description": "Description:",
+  "dueDate": "Due Date:"
 }

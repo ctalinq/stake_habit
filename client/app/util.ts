@@ -14,6 +14,12 @@ export function getApiPath(path: string) {
   return `${API_ADDRESS}/${path}`;
 }
 
+export const formatDate = (timeMs: number) => {
+  const date = new Date(timeMs * 1000);
+
+  return formatDateToString(date);
+};
+
 export function formatDateToString(date: Date) {
   const day = date.getDate();
   const month = date.getMonth() + 1;
