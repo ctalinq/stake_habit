@@ -5,9 +5,9 @@ import { useCommitmentContract } from "~/hooks/useCommitmentContract";
 import Spinner from "~/components/icons/spinner.svg?react";
 import CommitmentStatus from "./commitmentStatus";
 import { useTranslation } from "react-i18next";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRawInitData } from "@telegram-apps/sdk-react";
-import { formatDateToString } from "~/util";
+import { formatDate } from "~/util";
 import { useTonSender } from "~/hooks/useTonSender";
 import { useCommitmentUserData } from "~/hooks/useCommitmentUserData";
 
@@ -84,12 +84,6 @@ function Commitment({
       );
     },
   });
-
-  const formatDate = useCallback((timeMs: number) => {
-    const date = new Date(timeMs * 1000);
-
-    return formatDateToString(date);
-  }, []);
 
   return (
     <div>

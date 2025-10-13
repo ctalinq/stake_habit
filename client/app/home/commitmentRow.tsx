@@ -13,6 +13,7 @@ import type { VisitorDTO } from "~/types";
 import { Card } from "~/components";
 import { twMerge } from "tailwind-merge";
 import CommitmentStatusBadge from "~/containers/CommitmentStatusBadge";
+import { formatDate } from "~/util";
 
 const CommitmentInfo = ({
   title,
@@ -177,7 +178,15 @@ function CommitmentRow({
           )}
         </div>
       )}
-      {!isCollapsed && (
+      {!isCollapsed && commitmentData?.dueDate && (
+        <div className="mb-2">
+          <span className="text-sm text-gray-500 dark:text-white mr-9 pb-1">
+            {t("dueDate")}
+          </span>
+          <span className="text-sm">{formatDate(commitmentData.dueDate)}</span>
+        </div>
+      )}
+      {!isCollapsed && commitmentData?.description && (
         <div>
           <p className="text-sm text-gray-500 dark:text-white mr-4 pb-1">
             {t("description")}
