@@ -63,12 +63,8 @@ export class CommitmentContract implements Contract {
       description: stack.readString(),
       dueDate: stack.readNumber(),
       awardedKeyList: parseRecipientKeyList(stack.readCell()),
+      balance: stack.readBigNumber(),
     };
-  }
-
-  async getBalance(provider: ContractProvider) {
-    const { stack } = await provider.get("balance", []);
-    return stack.readBigNumber();
   }
 
   async sendDeploy(provider: ContractProvider, via: Sender, value: bigint) {

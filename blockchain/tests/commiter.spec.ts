@@ -150,7 +150,6 @@ describe("commiter.fc contract tests", () => {
       });
 
       const savedCommitmentInfo = await commitmentContract.getInfo();
-      const savedStake = await commitmentContract.getBalance();
 
       expect(savedCommitmentInfo.stakerAddress.toString()).toEqual(
         stakerWallet.address.toString()
@@ -158,7 +157,7 @@ describe("commiter.fc contract tests", () => {
       expect(savedCommitmentInfo.title).toEqual(commitmentTitle);
       expect(savedCommitmentInfo.description).toEqual(commitmentDescription);
       expect(savedCommitmentInfo.dueDate).toEqual(dueDate);
-      expect(savedStake).toBeGreaterThan(stake);
+      expect(savedCommitmentInfo.balance).toBeGreaterThan(stake);
     }
   );
 

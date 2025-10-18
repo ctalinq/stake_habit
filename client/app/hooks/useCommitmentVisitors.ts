@@ -1,6 +1,6 @@
 import { useQuery, type InfiniteData } from "@tanstack/react-query";
 import { useRawInitData } from "@telegram-apps/sdk-react";
-import { useState } from "storybook/internal/preview-api";
+import { useState } from "react";
 import type { CommitmentDTO, VisitorDTO } from "~/types";
 
 const useCommitmentVisitors = ({
@@ -49,6 +49,8 @@ const useCommitmentVisitors = ({
         ...visitorsMap,
         ...grouped,
       });
+
+      return 1;
     },
   });
 

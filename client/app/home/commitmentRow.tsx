@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Address } from "@ton/core";
+import { Address, fromNano } from "@ton/core";
+import Ton from "~/components/icons/ton.svg?react";
 import useCommitmentStatus from "~/hooks/useCommitmentStatus";
 import { useCommitmentContract } from "~/hooks/useCommitmentContract";
 import { useTonSender } from "~/hooks/useTonSender";
@@ -36,20 +37,25 @@ const CommitmentInfo = ({
   });
 
   return (
-    <button onClick={onCollapse} className="flex items-center w-full">
+    <button
+      onClick={onCollapse}
+      className={twMerge("flex items-center w-full", !isCollapsed && "mb-2")}
+    >
       <div className="flex flew-nowrap grow-1 items-center pr-2 overflow-hidden">
         {isPolling ? (
-          <div className="flex basis-22 mr-2 shrink-0 items-center">
+          <div className="flex basis-22 mr-6 shrink-0 items-center">
             <Loading className="w-7 h-7" />
           </div>
         ) : (
           <CommitmentStatusBadge
-            additionalCardClassName="basis-22 shrink-0 mr-2"
+            additionalCardClassName="basis-22 shrink-0 mr-6"
             status={commitmentStatus}
           />
         )}
         <div className="grow shrink min-w-0">
-          <p className="text text-black dark:text-white truncate">{title}</p>
+          <p className="text-black dark:text-white text-start truncate">
+            {title}
+          </p>
         </div>
       </div>
       <div
@@ -151,7 +157,7 @@ function CommitmentRow({
       )}
       {!isCollapsed && visitors && visitors.length > 0 && (
         <div className="flex my-2 items-center">
-          <p className="text-sm text-gray-500 dark:text-white mr-4">
+          <p className="text-sm text-gray-500 dark:text-white w-[35%]">
             {t("viewers", { count: visitors.length })}
           </p>
           {visitors.slice(0, 7).map((visitor) => (
@@ -179,16 +185,27 @@ function CommitmentRow({
         </div>
       )}
       {!isCollapsed && commitmentData?.dueDate && (
-        <div className="mb-2">
-          <span className="text-sm text-gray-500 dark:text-white mr-9 pb-1">
+        <div className="flex mb-2">
+          <span className="text-sm text-gray-500 dark:text-white pb-1 w-[35%]">
             {t("dueDate")}
           </span>
           <span className="text-sm">{formatDate(commitmentData.dueDate)}</span>
         </div>
       )}
+      {!isCollapsed && commitmentData && (
+        <div className="flex mb-2">
+          <span className="text-sm text-gray-500 dark:text-white pb-1 w-[35%]">
+            {t("balance")}
+          </span>
+          <span className="text-sm mr-2">
+            {Number(fromNano(commitmentData.balance)).toFixed(2)}
+          </span>
+          <Ton />
+        </div>
+      )}
       {!isCollapsed && commitmentData?.description && (
         <div>
-          <p className="text-sm text-gray-500 dark:text-white mr-4 pb-1">
+          <p className="text-sm text-gray-500 dark:text-white pb-1">
             {t("description")}
           </p>
           <p className="text-sm">{commitmentData?.description}</p>

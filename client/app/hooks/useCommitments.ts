@@ -1,10 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRawInitData } from "@telegram-apps/sdk-react";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-} from "storybook/internal/preview-api";
+import { useCallback, useEffect, useMemo } from "react";
 import useWallet from "~/hooks/useWallet";
 import type { CommitmentDTO } from "~/types";
 
