@@ -40,6 +40,7 @@ const CommitmentStatusBadge = ({
   );
 
   const textClassName = twMerge(
+    "whitespace-nowrap",
     status === "success" && "text-green-600",
     status === "failed" && "text-red-600",
     status === "inProcess" && "text-yellow-600",

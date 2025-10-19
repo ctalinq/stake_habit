@@ -51,7 +51,7 @@ int status::failed() asm "2 PUSHINT";
 }
 
 
-(int, slice, cell, cell, int, cell) get_info() method_id {
+(int, slice, cell, cell, int, cell, int) get_info() method_id {
     (
         int status,
         slice staker_address,
@@ -63,19 +63,17 @@ int status::failed() asm "2 PUSHINT";
         cell awarded_key_list
     ) = load_data();
 
+    var [balance, _] = get_balance();
+
     return (
         status,
         staker_address,
         title,
         description,
         due_date,
-        awarded_key_list
+        awarded_key_list,
+        balance
     );
-}
-
-int balance() method_id {
-    var [balance, _] = get_balance();
-    return balance;
 }
 
 () recv_internal(int msg_value, cell in_msg_full, slice in_msg_body) impure {
@@ -127,14 +125,16 @@ int balance() method_id {
         throw_if(77, already_awarded == 1);
 
         int recipient_key_found = find_cell_tree_slice(recipients_key_list, recipient_key_hash);
-        ;;todo add min max balance
-        int award = balance() / recipients_count;
 
         ;;todo add exit codes table
         ;;todo check due time
         ;;todo check status if completed - not get paid
         ;;todo check status if valid
         throw_if(76, recipient_key_found == -1);
+
+        var [balance, _] = get_balance();
+        int awarded_recipients_count = get_cell_tree_count(awarded_key_list);
+        int award = balance / (recipients_count - awarded_recipients_count);
 
         var msg = begin_cell()
             .store_uint(0x18, 6)

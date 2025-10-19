@@ -7,5 +7,6 @@
   },
   "viewers": "Viewers({{count}}):",
   "description": "Description:",
+  "balance": "Balance:",
   "dueDate": "Due Date:"
 }

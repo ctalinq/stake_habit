@@ -38,7 +38,8 @@ const createCommitment = async ({
     )
   );
 
-  await commitmentContract.sendDeploy(deployer.getSender(), toNano("0.05"));
+  const initialBalance = toNano("50");
+  await commitmentContract.sendDeploy(deployer.getSender(), initialBalance);
   //@ts-expect-error mock hook returs type dismatched
   return commitmentContract as OpenedContract<CommitmentContract>;
 };
