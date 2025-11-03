@@ -79,3 +79,21 @@ export const FailedCommitment: Story = {
     });
   },
 };
+
+export const FailedCommitmentWithoutWallet: Story = {
+  args: {
+    params: {
+      commitmentAddress: TEST_COMMITMENT_ADDRESS,
+    },
+  },
+  beforeEach: async () => {
+    const contract = await createFailedCommitment();
+    mocked(useCommitmentContract).mockReturnValue(contract);
+    mocked(useWallet).mockReturnValue(null);
+    mocked(useCommitmentUserData).mockReturnValue({
+      data: {
+        tg_user_photo_link: avatar,
+      },
+    });
+  },
+};

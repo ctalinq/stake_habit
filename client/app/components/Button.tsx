@@ -1,4 +1,6 @@
 import React from "react";
+import Spinner from "./icons/spinner.svg?react";
+import { twMerge } from "tailwind-merge";
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -8,6 +10,7 @@ interface ButtonProps {
   variant?: "primary" | "secondary" | "danger";
   size?: "sm" | "md" | "lg";
   className?: string;
+  isProcessing?: boolean;
 }
 
 export default function Button({
@@ -18,8 +21,10 @@ export default function Button({
   variant = "primary",
   size = "md",
   className = "",
+  isProcessing,
 }: ButtonProps) {
-  const baseStyles = "rounded-xl font-medium transition-all duration-300 transform active:scale-95 focus:outline-none focus:ring-0";
+  const baseStyles =
+    "rounded-xl flex items-center font-medium transition-all duration-300 transform active:scale-95 focus:outline-none focus:ring-0";
 
   const sizeStyles = {
     sm: "py-2 px-3 text-sm",
@@ -44,8 +49,16 @@ export default function Button({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
+      className={twMerge(
+        `${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]}`,
+        className
+      )}
     >
+      {isProcessing && (
+        <div className="w-[24px] mr-2">
+          <Spinner />
+        </div>
+      )}
       {children}
     </button>
   );
