@@ -1,26 +1,20 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Address, type OpenedContract } from "@ton/core";
+import { Address, fromNano, type OpenedContract } from "@ton/core";
 import { CommitmentContract } from "blockchain/commitmentContract";
+import Ton from "~/components/icons/ton.svg?react";
 import { useCommitmentContract } from "~/hooks/useCommitmentContract";
-import Spinner from "~/components/icons/spinner.svg?react";
-import CommitmentStatus from "./commitmentStatus";
+import useWallet from "~/hooks/useWallet";
 import { useTranslation } from "react-i18next";
 import { useMemo, useState } from "react";
 import { useRawInitData } from "@telegram-apps/sdk-react";
 import { formatDate } from "~/util";
 import { useTonSender } from "~/hooks/useTonSender";
 import { useCommitmentUserData } from "~/hooks/useCommitmentUserData";
-
-function LoadingPlaceholder() {
-  const { t } = useTranslation("commitments");
-
-  return (
-    <div className="pt-10 flex flex-col items-center">
-      <p className="text-3xl mb-8 text-black dark:text-white">{t("loading")}</p>
-      <Spinner className="fill-black dark:fill-white" width={80} height={80} />
-    </div>
-  );
-}
+import CommitementSekeleton from "./commitmentSkeleton";
+import { Button, Container } from "~/components";
+import CommitmentStatusBadge from "~/containers/CommitmentStatusBadge";
+import useCommitmentStatus from "~/hooks/useCommitmentStatus";
+import { TonConnectButton } from "~/containers";
 
 function Commitment({
   commitmentContract,
@@ -31,6 +25,7 @@ function Commitment({
 }) {
   const { t } = useTranslation("commitments");
   const initData = useRawInitData();
+  const wallet = useWallet();
   const { sender } = useTonSender();
   const [isGettingRewards, setIsGettingRewards] = useState(false);
   const queryClient = useQueryClient();
@@ -85,47 +80,66 @@ function Commitment({
     },
   });
 
-  return (
-    <div>
-      {commitmentData ? (
-        <div className="pt-8">
-          <div className="flex gap-1 align-center">
-            <img
-              src={userData?.tg_user_photo_link}
-              alt="User Avatar"
-              className="w-12 h-12 avatar-ring mr-3 mb-6 shrink-0"
-            />
-            <p className="text-xl mb-2 text-black dark:text-white">
-              {commitmentData.title}
-            </p>
-          </div>
-          <p className="mb-4 text-black dark:text-white">
-            {commitmentData.description}
-          </p>
-          <p className="mb-5 text-black dark:text-white">
-            {t("due", { date: formatDate(commitmentData.dueDate) })}
-          </p>
-          <CommitmentStatus
-            isGettingRewards={isGettingRewards}
-            onGetReward={() => {
-              if (sender) {
-                commitmentContract.sendRecipientWithdrawal(
-                  sender,
-                  commitmentKey
-                );
-                setIsGettingRewards(true);
-              }
-            }}
-            commitmentKey={commitmentKey}
-            alreadyRewardedKeys={commitmentData.awardedKeyList}
-            status={commitmentData.status}
-            dueDate={commitmentData.dueDate}
-          />
-        </div>
-      ) : (
-        <LoadingPlaceholder />
+  const commitmentStatus = useCommitmentStatus(commitmentData);
+
+  return commitmentData ? (
+    <>
+      <div className="flex gap-1 align-center">
+        <img
+          src={userData?.tg_user_photo_link}
+          alt="User Avatar"
+          className="w-12 h-12 avatar-ring mr-3 mb-6 shrink-0"
+        />
+        <p className="text-xl mb-2 text-black dark:text-white">
+          {commitmentData.title}
+        </p>
+      </div>
+      <p className="mb-4 text-black dark:text-white">
+        {commitmentData.description}
+      </p>
+      <p className="mb-5 text-black dark:text-white">
+        {t("due", { date: formatDate(commitmentData.dueDate) })}
+      </p>
+      <div className="mb-5 flex items-center">
+        <span className="text-lg text-black dark:text-white mr-2">
+          {t("reward")}
+        </span>
+        <span className="text-lg mr-2">
+          {Number(fromNano(commitmentData.balance)).toFixed(2)}
+        </span>
+        <Ton />
+      </div>
+      <CommitmentStatusBadge
+        size="md"
+        additionalCardClassName="w-24 mb-4"
+        status={commitmentStatus}
+      />
+      {!wallet && commitmentStatus === "failed" && (
+        <>
+          <p className="text-red-500 text-l mb-2">{t("connectWallet")}</p>
+          <TonConnectButton onConnectStart={() => {}} />
+        </>
       )}
-    </div>
+      {commitmentStatus === "failed" &&
+        wallet &&
+        (!commitmentData.awardedKeyList.includes(commitmentKey) ? (
+          <Button
+            disabled={isGettingRewards}
+            isProcessing={isGettingRewards}
+            className="mt-6"
+            onClick={() => {
+              commitmentContract.sendRecipientWithdrawal(sender, commitmentKey);
+              setIsGettingRewards(true);
+            }}
+          >
+            {t("getRewards")}
+          </Button>
+        ) : (
+          <p className="text-gray-600 text-2xl">{t("alreadyRewarded")}</p>
+        ))}
+    </>
+  ) : (
+    <CommitementSekeleton />
   );
 }
 
@@ -146,15 +160,15 @@ export default function CommitmentPage({
   );
 
   return (
-    <div>
+    <Container>
       {commitmentContract ? (
         <Commitment
           commitmentKey={key}
           commitmentContract={commitmentContract}
         />
       ) : (
-        <LoadingPlaceholder />
+        <CommitementSekeleton />
       )}
-    </div>
+    </Container>
   );
 }

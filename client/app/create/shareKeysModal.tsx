@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Modal } from "~/components";
 import { shareMessage } from "@telegram-apps/sdk-react";
 import { useTranslation } from "react-i18next";
-import Spinner from "~/components/icons/spinner.svg?react";
 
 interface ShareKeysModalProps {
   messageIds?: string[];
@@ -54,7 +53,7 @@ function ShareKeysModalContent({
           keyCount: messageIds.length,
         })}
       </p>
-      <Spinner className="fill-black dark:fill-white" />
+      <div>todo loader</div>
     </div>
   );
 }

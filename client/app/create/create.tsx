@@ -9,7 +9,6 @@ import {
   TextInput,
   Modal,
 } from "~/components";
-import Spinner from "~/components/icons/spinner.svg?react";
 import { startOfDay } from "~/util";
 import { TonConnectButton } from "~/containers";
 import { useTonWallet } from "@tonconnect/ui-react";
@@ -345,7 +344,7 @@ export default function Create() {
         <p className="text-center mb-9 text-black dark:text-white">
           {t("commitmentDeploymentModal.text")}
         </p>
-        <Spinner className="fill-black dark:fill-white" />
+        <div>todo loader</div>
       </Modal>
 
       <Modal

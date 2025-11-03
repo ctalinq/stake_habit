@@ -6,5 +6,6 @@
   "failed": "Commitment Failed",
   "getRewards": "Get Rewards",
   "alreadyRewarded": "Already Rewarded",
+  "reward": "Reward:",
   "connectWallet": "To get reward you need to connect your wallet"
 }
