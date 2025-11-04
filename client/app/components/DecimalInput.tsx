@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { twMerge } from "tailwind-merge";
 import { roundTo } from "~/util";
 
 interface DecimalInputProps {
@@ -74,6 +75,17 @@ export default function DecimalInput({
 
   const isValid = !validationError && !isNaN(parseFloat(dirtyValue));
   const showError = error || validationError;
+  const inputClassName = twMerge(
+    "w-full px-3 pt-6 pb-2 pr-12 rounded-xl border-2 transition-all duration-200 bg-gray-50 dark:bg-gray-900/60 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400 backdrop-blur-sm dark:backdrop-blur-md focus:outline-none focus:ring-0",
+    focused &&
+      "border-blue-400 dark:border-blue-400 shadow-lg shadow-blue-400/20 dark:shadow-blue-400/30 dark:bg-gray-800/80",
+    !focused &&
+      (isValid || dirtyValue.trim() === "") &&
+      "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 dark:hover:bg-gray-800/70",
+    !focused &&
+      !(isValid || dirtyValue.trim() === "") &&
+      "border-red-400 dark:border-red-400"
+  );
 
   return (
     <div className={`w-full ${className}`}>
@@ -97,17 +109,7 @@ export default function DecimalInput({
             onFocus={handleFocus}
             onBlur={handleBlur}
             placeholder={focused ? placeholder : ""}
-            className={`w-full px-3 pt-6 pb-2 pr-12 rounded-xl border-2 transition-all duration-200 bg-gray-50 dark:bg-gray-900/60 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400 backdrop-blur-sm dark:backdrop-blur-md focus:outline-none focus:ring-0 font-mono text-lg ${
-              focused
-                ? "border-blue-400 dark:border-blue-400 shadow-lg shadow-blue-400/20 dark:shadow-blue-400/30 dark:bg-gray-800/80"
-                : isValid || dirtyValue.trim() === ""
-                  ? "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 dark:hover:bg-gray-800/70"
-                  : "border-red-400 dark:border-red-400"
-            } ${
-              showError && dirtyValue.trim() !== ""
-                ? "border-red-400 dark:border-red-400"
-                : ""
-            }`}
+            className={inputClassName}
           />
 
           {/* Decimal Icon */}
