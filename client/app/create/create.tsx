@@ -239,7 +239,7 @@ export default function Create() {
   };
 
   return (
-    <Card>
+    <Card className="page-transition">
       <div className="space-y-2">
         <TextInput
           value={title}

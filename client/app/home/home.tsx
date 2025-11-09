@@ -16,7 +16,7 @@ export default function Home() {
   });
 
   return (
-    <>
+    <div className="page-transition">
       <Card className="mb-4">
         <div className="space-y-6">
           <Link
@@ -39,6 +39,6 @@ export default function Home() {
             />
           ))}
       </div>
-    </>
+    </div>
   );
 }
