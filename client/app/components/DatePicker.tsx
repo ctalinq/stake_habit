@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 interface DatePickerProps {
   value: Date;
@@ -36,12 +37,30 @@ export default function DatePicker({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const dateString = e.target.value;
-    const date = parseDateFromInput(dateString);
-    onChange(date);
+    if (dateString) {
+      const date = parseDateFromInput(dateString);
+      onChange(date);
+    }
   };
 
   const showError = error;
   const showGood = good && value && !showError;
+
+  const inputClassName = twMerge(
+    "relative w-full min-h-12 px-3 pt-6 pb-2 pr-12 rounded-xl border-2 transition-all duration-200 bg-gray-50 dark:bg-gray-900/60 text-gray-900 dark:text-gray-100 backdrop-blur-sm dark:backdrop-blur-md focus:outline-none focus:ring-0",
+    disabled &&
+      "cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500",
+    !disabled &&
+      "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 dark:hover:bg-gray-800/70",
+    !disabled &&
+      focused &&
+      "border-blue-400 dark:border-blue-400 shadow-lg shadow-blue-400/20 dark:shadow-blue-400/30 dark:bg-gray-800/80",
+    !disabled && !focused && showError && "border-red-400 dark:border-red-400",
+    !disabled &&
+      !focused &&
+      !showError &&
+      "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 dark:hover:bg-gray-800/70"
+  );
 
   return (
     <div className={`w-full ${className}`}>
@@ -54,17 +73,7 @@ export default function DatePicker({
           {label}
         </label>
 
-        <div
-          className={`relative w-full min-h-12 px-3 pt-6 pb-2 pr-12 rounded-xl border-2 transition-all duration-200 bg-gray-50 dark:bg-gray-900/60 text-gray-900 dark:text-gray-100 backdrop-blur-sm dark:backdrop-blur-md focus:outline-none focus:ring-0 ${
-            disabled
-              ? "cursor-not-allowed bg-gray-100 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500"
-              : focused
-                ? "border-blue-400 dark:border-blue-400 shadow-lg shadow-blue-400/20 dark:shadow-blue-400/30 dark:bg-gray-800/80"
-                : showError
-                  ? "border-red-400 dark:border-red-400"
-                  : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 dark:hover:bg-gray-800/70"
-          }`}
-        >
+        <div className={inputClassName}>
           <input
             type="date"
             value={formatDateForInput(value)}
