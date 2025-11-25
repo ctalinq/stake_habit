@@ -104,7 +104,7 @@ function Commitment({
         <span className="text-lg text-black dark:text-white mr-2">
           {t("reward")}
         </span>
-        <span className="text-lg mr-2">
+        <span className="text-lg mr-2 dark:text-white">
           {Number(fromNano(commitmentData.balance)).toFixed(2)}
         </span>
         <Ton />

@@ -64,7 +64,7 @@ const CommitmentInfo = ({
           isCollapsed ? "rotate-0" : "rotate-180"
         )}
       >
-        <Arrow className="w-5 h-5" />
+        <Arrow className="w-5 h-5 dark:fill-white" />
       </div>
     </button>
   );
@@ -189,7 +189,9 @@ function CommitmentRow({
           <span className="text-sm text-gray-500 dark:text-white pb-1 w-[35%]">
             {t("dueDate")}
           </span>
-          <span className="text-sm">{formatDate(commitmentData.dueDate)}</span>
+          <span className="text-sm dark:text-white">
+            {formatDate(commitmentData.dueDate)}
+          </span>
         </div>
       )}
       {!isCollapsed && commitmentData && (
@@ -197,7 +199,7 @@ function CommitmentRow({
           <span className="text-sm text-gray-500 dark:text-white pb-1 w-[35%]">
             {t("balance")}
           </span>
-          <span className="text-sm mr-2">
+          <span className="text-sm dark:text-white mr-2">
             {Number(fromNano(commitmentData.balance)).toFixed(2)}
           </span>
           <Ton />
@@ -208,7 +210,9 @@ function CommitmentRow({
           <p className="text-sm text-gray-500 dark:text-white pb-1">
             {t("description")}
           </p>
-          <p className="text-sm">{commitmentData?.description}</p>
+          <p className="text-sm dark:text-white">
+            {commitmentData?.description}
+          </p>
         </div>
       )}
       {!isCollapsed && !isPolling && commitmentStatus === "inProcess" && (

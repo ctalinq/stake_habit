@@ -75,3 +75,7 @@
 ::view-transition-group(page-transition) {
   animation-duration: 0.5s;
 }
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.2);
+}
