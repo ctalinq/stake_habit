@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Modal } from "~/components";
+import Spinner from "~/components/icons/spinner.svg?react";
 import { shareMessage } from "@telegram-apps/sdk-react";
 import { useTranslation } from "react-i18next";
 
@@ -53,7 +54,7 @@ function ShareKeysModalContent({
           keyCount: messageIds.length,
         })}
       </p>
-      <div>todo loader</div>
+      <Spinner className="mx-auto mt-4 dark:fill-white w-12 h-12" />
     </div>
   );
 }

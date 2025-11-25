@@ -27,6 +27,7 @@ import ShareKeysModal from "./shareKeysModal";
 import { useCommitmentContract } from "../hooks/useCommitmentContract";
 import { useNavigate } from "react-router";
 import Ton from "~/components/icons/ton.svg?react";
+import DeployCommitmentModal from "~/commitments/DeployCommitmentModal";
 
 export default function Create() {
   const wallet = useTonWallet();
@@ -335,17 +336,7 @@ export default function Create() {
         <div className="text-center">{t("walletModal.description")}</div>
         <TonConnectButton onConnectStart={closeWalletModal} />
       </Modal>
-      <Modal
-        showCloseButton={false}
-        modalClassName="w-90 space-y-4 flex flex-col items-center"
-        isOpen={isDeployModalOpen}
-        onClose={() => {}}
-      >
-        <p className="text-center mb-9 text-black dark:text-white">
-          {t("commitmentDeploymentModal.text")}
-        </p>
-        <div>todo loader</div>
-      </Modal>
+      <DeployCommitmentModal isOpen={isDeployModalOpen} />
 
       <Modal
         showCloseButton={false}

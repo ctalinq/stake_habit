@@ -18,7 +18,10 @@ export default function Modal({
   modalClassName,
   moireClassName,
 }: ModalProps) {
-  const modalRoot = useMemo(() => document.getElementById("modal-root"), []);
+  const modalRoot = useMemo(
+    () => document.getElementById("modal-root"),
+    [isOpen]
+  );
 
   if (!isOpen || !modalRoot) return null;
 
