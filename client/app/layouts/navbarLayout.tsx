@@ -9,6 +9,24 @@ import { Container, ThemeToggle } from "~/components";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { TonConnectButton } from "~/containers";
 
+export const NavbarHeader = ({
+  isFullscreen,
+  photoUrl,
+}: {
+  isFullscreen: boolean;
+  photoUrl?: string;
+}) => {
+  return (
+    <div
+      className={`flex align-center ${isFullscreen ? "mt-25" : "mt-4"} mb-4`}
+    >
+      <img src={photoUrl} alt="User Avatar" className="w-12 h-12 avatar-ring" />
+      <ThemeToggle />
+      <TonConnectButton className="ml-auto" onConnectStart={() => {}} />
+    </div>
+  );
+};
+
 const NavbarLayout = () => {
   const launchParams = useLaunchParams();
   const navigate = useNavigate();
@@ -51,17 +69,10 @@ const NavbarLayout = () => {
 
   return (
     <Container>
-      <div
-        className={`flex align-center ${isFullscreen ? "mt-25" : "mt-4"} mb-4`}
-      >
-        <img
-          src={launchParams.tgWebAppData.user.photo_url}
-          alt="User Avatar"
-          className="w-12 h-12 avatar-ring"
-        />
-        <ThemeToggle />
-        <TonConnectButton className="ml-auto" onConnectStart={() => {}} />
-      </div>
+      <NavbarHeader
+        isFullscreen={isFullscreen}
+        photoUrl={launchParams.tgWebAppData.user.photo_url}
+      />
       <Outlet />
     </Container>
   );

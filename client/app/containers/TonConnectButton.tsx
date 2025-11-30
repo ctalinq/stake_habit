@@ -1,6 +1,7 @@
-import { useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
+import { useTonConnectUI } from "@tonconnect/ui-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import useWallet from "~/hooks/useWallet";
 import { Button } from "~/components";
 
 interface TonConnectButtonProps {
@@ -13,7 +14,7 @@ export default function TonConnectButton({
   onConnectStart,
 }: TonConnectButtonProps) {
   const [tonConnectUI] = useTonConnectUI();
-  const wallet = useTonWallet();
+  const wallet = useWallet();
   const { t } = useTranslation("common");
 
   const handleClick = useCallback(() => {

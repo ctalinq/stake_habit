@@ -4,14 +4,14 @@ import { hex as commitmentContractHex } from "blockchain/commitment";
 import { blockchain, deployer } from "./blockchain";
 import { generateRecipientsKeyList } from "blockchain/utils";
 
-const description = `
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin gravida maximus elit in mattis. Donec sed lectus gravida, feugiat lorem et, tincidunt sem. Integer nec semper sem, at pretium dolor. Morbi eget faucibus dui, quis tempor felis. Cras venenatis malesuada dolor, at blandit ex maximus ut. Mauris egestas pulvinar sodales. Donec in nunc eu ligula sagittis molestie sed nec mi. Pellentesque consectetur tellus tincidunt molestie rhoncus. Nulla venenatis sollicitudin nulla non molestie. Curabitur bibendum nulla venenatis ex viverra sagittis. Aenean lorem ante, tempus at tellus eget, commodo aliquet urna. Donec non dolor diam. Nulla maximus eget nunc eget dapibus. Vestibulum dictum ac nibh mattis vestibulum. Maecenas tincidunt interdum quam.
-`;
-
 const createCommitment = async ({
+  title,
+  description,
   dueDate,
   status,
 }: {
+  title: string;
+  description: string;
   dueDate: number;
   status?: number;
 }) => {
@@ -30,8 +30,8 @@ const createCommitment = async ({
       {
         status,
         stakerAddress: stakerWallet.address,
-        title: "Commitment With Very Long Title",
-        description: description,
+        title,
+        description,
         dueDate: dueDateSeconds,
         recipientsList: recipientsKeyList,
         recipientsCount: keys.length,
@@ -46,19 +46,45 @@ const createCommitment = async ({
   return commitmentContract as OpenedContract<CommitmentContract>;
 };
 
-export const createFailedCommitment = async () => {
+export const createFailedCommitment = async ({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) => {
   return createCommitment({
     dueDate: Date.now(),
+    title,
+    description,
   });
 };
 
-export const createInProgressCommitment = async () => {
-  return createCommitment({ dueDate: Date.now() + 1000 * 60 * 60 * 24 });
+export const createInProgressCommitment = async ({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) => {
+  return createCommitment({
+    title,
+    description,
+    dueDate: Date.now() + 1000 * 60 * 60 * 24,
+  });
 };
 
-export const createSuccessCommitment = async () => {
+export const createSuccessCommitment = async ({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) => {
   return createCommitment({
     dueDate: Date.now() + 24,
     status: 1,
+    title,
+    description,
   });
 };

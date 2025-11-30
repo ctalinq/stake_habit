@@ -37,7 +37,10 @@ export const FailedCommitment: Story = {
     visitors: [],
   },
   beforeEach: async () => {
-    const contract = await createFailedCommitment();
+    const contract = await createFailedCommitment({
+      title: "Todo",
+      description: "Todo",
+    });
     mocked(useCommitmentContract).mockReturnValue(contract);
   },
 };
@@ -48,7 +51,10 @@ export const InProgressCommitment: Story = {
     visitors: [],
   },
   beforeEach: async () => {
-    const contract = await createInProgressCommitment();
+    const contract = await createInProgressCommitment({
+      title: "Todo",
+      description: "Todo",
+    });
     mocked(useCommitmentContract).mockReturnValue(contract);
   },
 };
@@ -59,7 +65,10 @@ export const SuccessfulCommitment: Story = {
     visitors: [],
   },
   beforeEach: async () => {
-    const contract = await createSuccessCommitment();
+    const contract = await createSuccessCommitment({
+      title: "Todo",
+      description: "Todo",
+    });
     mocked(useCommitmentContract).mockReturnValue(contract);
   },
 };

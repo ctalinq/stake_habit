@@ -142,7 +142,13 @@ function CommitmentRow({
   });
 
   return (
-    <Card className="p-3">
+    <Card
+      className={twMerge(
+        "p-3",
+        "transition-[max-height] duration-300 overflow-hidden",
+        isCollapsed ? "max-h-[50px]" : "max-h-[600px]"
+      )}
+    >
       {commitmentData ? (
         <CommitmentInfo
           title={commitmentData.title}
@@ -210,7 +216,7 @@ function CommitmentRow({
           <p className="text-sm text-gray-500 dark:text-white pb-1">
             {t("description")}
           </p>
-          <p className="text-sm dark:text-white">
+          <p className="text-sm dark:text-white whitespace-pre-wrap">
             {commitmentData?.description}
           </p>
         </div>

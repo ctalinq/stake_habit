@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import ownerAvatar from "~/home/stories/ownerAvatar.png";
+import { NavbarHeader } from "~/layouts/navbarLayout";
 import Create from "../create";
 
 const meta = {
@@ -12,6 +14,7 @@ const meta = {
   decorators: [
     (Story) => (
       <div className="p-3 h-screen">
+        <NavbarHeader photoUrl={ownerAvatar} isFullscreen={false} />
         <Story />
       </div>
     ),

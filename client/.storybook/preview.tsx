@@ -3,6 +3,7 @@ import { INITIAL_VIEWPORTS } from "storybook/viewport";
 import { sb } from "storybook/test";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router";
+import { ThemeProvider } from "../app/hooks/useTheme";
 import "~/i18n";
 import "~/app.css";
 import mockEnv from "../app/layouts/mockEnv";
@@ -74,7 +75,9 @@ const preview: Preview = {
             <TonConnectUIProvider
               manifestUrl={"https://example.com/manifest.json"}
             >
-              <Story />
+              <ThemeProvider>
+                <Story />
+              </ThemeProvider>
             </TonConnectUIProvider>
           </QueryClientProvider>
         </MemoryRouter>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { twMerge } from "tailwind-merge";
 
 interface TextAreaProps {
   value: string;
@@ -61,7 +62,7 @@ export default function TextArea({
     <div className={`w-full ${className}`}>
       <div className="relative">
         <label
-          className={`absolute dark:bg-gray-900/60 left-3 transition-all duration-200 pointer-events-none z-1 ${
+          className={`absolute bg-white dark:bg-gray-900/60 left-3 transition-all duration-200 pointer-events-none z-1 ${
             focused || value
               ? "top-1 pt-1 text-xs text-blue-400 dark:text-white"
               : "top-1 pt-3 text-sm text-gray-400 dark:text-white"
@@ -77,25 +78,32 @@ export default function TextArea({
           onBlur={() => setFocused(false)}
           placeholder={focused ? placeholder : ""}
           rows={rows}
-          className={`w-full px-3 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 bg-gray-50 dark:bg-gray-900/60 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400 backdrop-blur-sm dark:backdrop-blur-md focus:outline-none focus:ring-0 resize-none ${
-            focused
-              ? "border-blue-400 dark:border-blue-400 shadow-lg shadow-blue-400/20 dark:shadow-blue-400/30 dark:bg-gray-800/80"
-              : isValid
-                ? "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 dark:hover:bg-gray-800/70"
-                : "border-red-400 dark:border-red-400"
-          } ${showError ? "border-red-400 dark:border-red-400" : ""}`}
+          className={twMerge(
+            "w-full px-3 pt-6 pb-2 rounded-xl border-2 transition-all duration-200 bg-gray-50 dark:bg-gray-900/60 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400 backdrop-blur-sm dark:backdrop-blur-md focus:outline-none focus:ring-0 resize-none",
+            focused &&
+              "border-blue-400 dark:border-blue-400 shadow-lg shadow-blue-400/20 dark:shadow-blue-400/30 dark:bg-gray-800/80",
+            !focused &&
+              isValid &&
+              "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 dark:hover:bg-gray-800/70",
+            !focused && !isValid && "border-red-400 dark:border-red-400",
+            showError ? "border-red-400 dark:border-red-400" : ""
+          )}
           maxLength={maxLength}
         />
 
         {showCharCounter && (
           <div
-            className={`absolute right-3 top-3 text-xs font-medium transition-colors duration-200 ${
-              charCount > maxLength * 0.9
-                ? "text-orange-400 dark:text-orange-300"
-                : charCount === maxLength
-                  ? "text-red-400 dark:text-red-300"
-                  : "text-gray-400 dark:text-gray-500"
-            }`}
+            className={twMerge(
+              "absolute right-3 top-3 text-xs font-medium transition-colors duration-200",
+              charCount > maxLength * 0.9 &&
+                "text-orange-400 dark:text-orange-300",
+              charCount >= maxLength * 0.9 &&
+                charCount === maxLength &&
+                "text-red-400 dark:text-red-300",
+              charCount >= maxLength * 0.9 &&
+                charCount !== maxLength &&
+                "text-gray-400 dark:text-gray-500"
+            )}
           >
             {charCount}/{maxLength}
           </div>

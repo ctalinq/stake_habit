@@ -51,7 +51,10 @@ export const SuccessfulCommitment: Story = {
     },
   },
   beforeEach: async () => {
-    const contract = await createSuccessCommitment();
+    const contract = await createSuccessCommitment({
+      title: "Todo",
+      description: "Todo",
+    });
     mocked(useCommitmentContract).mockReturnValue(contract);
     mocked(useCommitmentUserData).mockReturnValue({
       data: {
@@ -68,7 +71,10 @@ export const FailedCommitment: Story = {
     },
   },
   beforeEach: async () => {
-    const contract = await createFailedCommitment();
+    const contract = await createFailedCommitment({
+      title: "Todo",
+      description: "Todo",
+    });
     mocked(useCommitmentContract).mockReturnValue(contract);
     //@ts-expect-error just return not empty object
     mocked(useWallet).mockReturnValue({});
@@ -87,7 +93,10 @@ export const FailedCommitmentWithoutWallet: Story = {
     },
   },
   beforeEach: async () => {
-    const contract = await createFailedCommitment();
+    const contract = await createFailedCommitment({
+      title: "Todo",
+      description: "Todo",
+    });
     mocked(useCommitmentContract).mockReturnValue(contract);
     mocked(useWallet).mockReturnValue(null);
     mocked(useCommitmentUserData).mockReturnValue({
