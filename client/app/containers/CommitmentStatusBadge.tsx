@@ -48,6 +48,8 @@ const CommitmentStatusBadge = ({
     size === "md" && "text-sm"
   );
 
+  console.log(size);
+
   return (
     <div className={cardClassName}>
       <span className={rectangleClassName} />

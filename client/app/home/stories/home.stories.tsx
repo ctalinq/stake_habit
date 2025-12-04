@@ -36,6 +36,7 @@ const meta = {
       <div className="p-3 h-screen">
         <NavbarHeader photoUrl={ownerAvatar} isFullscreen={false} />
         <Story />
+        <div id="modal-root" />
       </div>
     ),
   ],

@@ -111,7 +111,7 @@ function Commitment({
       </div>
       <CommitmentStatusBadge
         size="md"
-        additionalCardClassName="w-24 mb-4"
+        additionalCardClassName="w-27 mb-4"
         status={commitmentStatus}
       />
       {!wallet && commitmentStatus === "failed" && (

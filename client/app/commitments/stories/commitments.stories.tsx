@@ -3,12 +3,15 @@ import CommitmentPage from "../commitment";
 import { mocked } from "storybook/internal/test";
 import {
   createFailedCommitment,
+  createInProgressCommitment,
   createSuccessCommitment,
 } from "~/__mocks__/commitments";
 import { useCommitmentContract } from "~/hooks/useCommitmentContract";
 import { useCommitmentUserData } from "~/hooks/useCommitmentUserData";
 import useWallet from "~/hooks/useWallet";
-import avatar from "./avatar.png";
+import { NavbarHeader } from "~/layouts/navbarLayout";
+import ownerAvatar from "./ownerAvatar.png";
+import zigAvatar from "./zigAvatar.png";
 
 const TEST_COMMITMENT_ADDRESS =
   "UQCI7d2SQ9ili8W41vpsIuaMyVmBMQcsBxEcM01UE5aL-j5l";
@@ -23,7 +26,8 @@ const meta = {
   },
   decorators: [
     (Story) => (
-      <div className="p-3 h-screen">
+      <div className="p-3">
+        <NavbarHeader photoUrl={ownerAvatar} isFullscreen={false} />
         <Story />
       </div>
     ),
@@ -58,7 +62,32 @@ export const SuccessfulCommitment: Story = {
     mocked(useCommitmentContract).mockReturnValue(contract);
     mocked(useCommitmentUserData).mockReturnValue({
       data: {
-        tg_user_photo_link: avatar,
+        tg_user_photo_link: zigAvatar,
+      },
+    });
+  },
+};
+
+export const InProgressCommitment: Story = {
+  args: {
+    params: {
+      commitmentAddress: TEST_COMMITMENT_ADDRESS,
+    },
+  },
+  beforeEach: async () => {
+    const contract = await createInProgressCommitment({
+      title: "Read 50 Pages 📚",
+      description: `
+By 2025.12.12 I must read at least 50 pages of any book.
+If I fail, my TON stake becomes someone else’s reward 💸
+A simple challenge with real pressure — grow your mind or lose your coins.
+Let’s see what wins: discipline or distraction 📵⚡
+`,
+    });
+    mocked(useCommitmentContract).mockReturnValue(contract);
+    mocked(useCommitmentUserData).mockReturnValue({
+      data: {
+        tg_user_photo_link: zigAvatar,
       },
     });
   },
@@ -80,7 +109,7 @@ export const FailedCommitment: Story = {
     mocked(useWallet).mockReturnValue({});
     mocked(useCommitmentUserData).mockReturnValue({
       data: {
-        tg_user_photo_link: avatar,
+        tg_user_photo_link: zigAvatar,
       },
     });
   },
@@ -101,7 +130,7 @@ export const FailedCommitmentWithoutWallet: Story = {
     mocked(useWallet).mockReturnValue(null);
     mocked(useCommitmentUserData).mockReturnValue({
       data: {
-        tg_user_photo_link: avatar,
+        tg_user_photo_link: zigAvatar,
       },
     });
   },
