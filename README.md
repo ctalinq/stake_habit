@@ -9,7 +9,14 @@ Shareable challenge links make it easy to invite friends, build accountability, 
 ![Watch the video](./client/public/sh_intro.gif)
 
 
-## Infra
+### Tech Stack
+* Language: Go / TypeScript / Func
+* Fronted: React + Tailwind / React-Router / useQuery / Storybook / Vite
+* Backend: gin / gotgbot / sqlx
+* Blockchain: @ton
+* Tools: Docker / Vite / Turborepo / Jest / Github Actions
+
+
 - Before development run database
 ```bash
 docker compose up -d postgress
