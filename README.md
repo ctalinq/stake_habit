@@ -14,15 +14,29 @@ Shareable challenge links make it easy to invite friends, build accountability, 
 * Fronted: React + Tailwind / React-Router / useQuery / Storybook / Vite
 * Backend: gin / gotgbot / sqlx
 * Blockchain: @ton
-* Tools: Docker / Vite / Turborepo / Jest / Github Actions
+* Tools: Docker / Vite / Turborepo / Jest / Github Actions / Hucky + Precommit
 
-
-- Before development run database
+## Running the project
+### Client
 ```bash
-docker compose up -d postgress
+npm run dev
 ```
-
-- To run database migration (always run before first development)
+### Database (Postgres)
+#### run container
+```bash
+docker compose up -d postgres
+```
+#### run migrations (after first container launch ⚠️)
 ```bash
 docker compose migrate up
+```
+### Tg-bot
+```bash
+cd tg-bot
+air
+```
+## Blockchain (deploying commiter or commitment)
+```
+cd blockchain
+npm run blueprint
 ```
