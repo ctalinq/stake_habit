@@ -6,7 +6,7 @@ If they fail - their friends can claim the reward.
 
 Shareable challenge links make it easy to invite friends, build accountability, and create social pressure that actually works.
 
-[![Watch the video](./client/public/manifestIcon.png)](./client/public/sh_intro.mp4)
+![Watch the video](./client/public/sh_intro.gif)
 
 
 ## Infra
