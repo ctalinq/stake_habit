@@ -1,9 +1,13 @@
-# StakeHabit
-## todo-orch
+# 📘 StakeHabit - Telegram Mini App for High-Stakes Habit Challenges
+StakeHabit is a Telegram Mini App built on the TON blockchain that turns personal challenges into real, high-stakes commitments.
 
-### API IMPROVEMENTS
-* Describe test telegram environment process, links to bot and web app
-* App polyfill for telegram-sdk to test app in browser
+Users create challenges with a deadline and place a TON stake on completing them. If they succeed - they keep their stake.
+If they fail - their friends can claim the reward.
+
+Shareable challenge links make it easy to invite friends, build accountability, and create social pressure that actually works.
+
+[![Watch the video](./client/public/manifestIcon.png)](./client/public/sh_intro.mp4)
+
 
 ## Infra
 - Before development run database
